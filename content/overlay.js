@@ -3,13 +3,13 @@
  *
  * Non-intrusive bottom-right notifications:
  * - Green for success, red for failure
- * - Auto-dismiss after configured duration
+ * - Auto-dismiss after 2000ms (hard-coded)
  * - Doesn't block trading UI
  */
 
 window.OKXOverlay = (() => {
   const CONTAINER_ID = 'okx-hotkey-overlay';
-  let overlayDuration = 2000;
+  const OVERLAY_DURATION = 2000; // ms, hard-coded
 
   /**
    * Ensure the toast container exists in the DOM.
@@ -58,7 +58,7 @@ window.OKXOverlay = (() => {
     });
 
     // Auto-dismiss
-    const dismissAfter = duration !== undefined ? duration : overlayDuration;
+    const dismissAfter = duration !== undefined ? duration : OVERLAY_DURATION;
     if (dismissAfter > 0) {
       setTimeout(() => dismiss(toast), dismissAfter);
     }
@@ -71,12 +71,11 @@ window.OKXOverlay = (() => {
    * @param {HTMLElement} toast
    * @param {string} message
    * @param {'info'|'success'|'error'|'loading'} type
-   * @param {number} [duration] — auto-dismiss after update (default: overlayDuration)
+   * @param {number} [duration] — auto-dismiss after update (default: OVERLAY_DURATION)
    */
   function update(toast, message, type, duration) {
     if (!toast || !toast.parentNode) return;
 
-    // Remove old type classes
     toast.className = `okx-hotkey-toast okx-hotkey-toast--${type} okx-hotkey-toast--visible`;
 
     const icon = toast.querySelector('.okx-hotkey-toast__icon');
@@ -90,7 +89,7 @@ window.OKXOverlay = (() => {
     }
     if (text) text.textContent = message;
 
-    const dismissAfter = duration !== undefined ? duration : overlayDuration;
+    const dismissAfter = duration !== undefined ? duration : OVERLAY_DURATION;
     if (dismissAfter > 0) {
       setTimeout(() => dismiss(toast), dismissAfter);
     }
@@ -107,14 +106,6 @@ window.OKXOverlay = (() => {
     setTimeout(() => {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
     }, 300); // match CSS transition
-  }
-
-  /**
-   * Set the auto-dismiss duration.
-   * @param {number} ms
-   */
-  function setDuration(ms) {
-    overlayDuration = ms;
   }
 
   /**
@@ -138,5 +129,5 @@ window.OKXOverlay = (() => {
     return show(message, 'loading', 0);
   }
 
-  return { show, update, dismiss, success, error, loading, setDuration };
+  return { show, update, dismiss, success, error, loading };
 })();

@@ -1,57 +1,89 @@
 /**
- * popup.js — Settings UI logic for OKX Hotkey extension
+ * popup.js — Settings UI logic for OKX Hotkey extension (v2)
  *
  * Handles:
- * - Loading/saving settings from chrome.storage.local
- * - Rendering 13 slot rows with enable toggle, hotkey recorder, pct input
- * - General settings section (overlayDuration, seedCap, confirmDangerous, soundEnabled)
- * - Querying content script for page detection status
+ * - Dynamic action add/remove
+ * - Per-action hotkey recording
+ * - Per-action sound upload (base64) + preview
+ * - General settings: seedCap, soundEnabled, donationMode
+ * - Load/save to chrome.storage.local (v2 schema)
+ * - Backward-compatible migration from v1 slots schema
+ *
+ * Storage schema source of truth: DEFAULT_ACTIONS, DEFAULT_GENERAL, and loadSettings() in this file.
+ * content/main.js is the other authoritative copy — keep in sync manually.
  */
 
 'use strict';
 
-// ── Default settings (mirrors lib/storage.js) ─────────────────────────────────
+// ── Action type definitions ───────────────────────────────────────────────────
 
-const DEFAULT_SLOTS = [
-  { id: 'MARKET_BUY',    label: '시장가 매수',       hotkey: { key: '1', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'MARKET_SELL',   label: '시장가 매도',       hotkey: { key: '2', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'LIMIT_BUY',     label: '지정가 매수',       hotkey: { key: '3', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'LIMIT_SELL',    label: '지정가 매도',       hotkey: { key: '4', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'TICK_BUY',      label: '틱 매수',           hotkey: { key: 'q', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'TICK_SELL',     label: '틱 매도',           hotkey: { key: 'w', ctrl: true, shift: true, alt: false }, percentage: 5,   enabled: true },
-  { id: 'PARTIAL_CLOSE', label: '부분 청산',         hotkey: { key: 'z', ctrl: true, shift: true, alt: false }, percentage: 50,  enabled: true },
-  { id: 'CLOSE_PAIR',    label: '페어 청산',         hotkey: { key: 'x', ctrl: true, shift: true, alt: false }, percentage: 100, enabled: true },
-  { id: 'CLOSE_ALL',     label: '전체 청산',         hotkey: { key: 'c', ctrl: true, shift: true, alt: false }, percentage: 100, enabled: true },
-  { id: 'FLIP',          label: '포지션 반전',       hotkey: { key: 'f', ctrl: true, shift: true, alt: false }, percentage: 100, enabled: true },
-  { id: 'CANCEL_LAST',   label: '마지막 주문 취소',  hotkey: { key: 'a', ctrl: true, shift: true, alt: false }, percentage: 0,   enabled: true },
-  { id: 'CANCEL_ALL',    label: '전체 주문 취소',    hotkey: { key: 's', ctrl: true, shift: true, alt: false }, percentage: 0,   enabled: true },
-  { id: 'CHASE_ORDER',   label: '주문 체이스',       hotkey: { key: 'd', ctrl: true, shift: true, alt: false }, percentage: 0,   enabled: true },
+const ACTION_TYPES = [
+  { type: 'MARKET_BUY',    label: '시장가 매수',      hasPct: true  },
+  { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true  },
+  { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true  },
+  { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true  },
+  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true  },
+  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true  },
+  { type: 'PARTIAL_CLOSE', label: '부분 청산',        hasPct: true  },
+  { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false },
+  { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false },
+  { type: 'FLIP',          label: '포지션 반전',      hasPct: false },
+  { type: 'CANCEL_LAST',   label: '마지막 주문 취소', hasPct: false },
+  { type: 'CANCEL_ALL',    label: '전체 주문 취소',   hasPct: false },
+  { type: 'CHASE_ORDER',   label: '주문 체이스',      hasPct: false },
 ];
 
 const DEFAULT_GENERAL = {
   soundEnabled: true,
-  confirmDangerous: true,
-  overlayDuration: 2000,
-  seedCap: 0
+  seedCap: 0,
+  donationMode: false
 };
+
+const DEFAULT_ACTIONS = [
+  {
+    id: 'init_mktbuy',
+    type: 'MARKET_BUY',
+    label: '시장가 매수',
+    hotkey: { key: '1', ctrl: true, shift: true, alt: false },
+    percentage: 5,
+    sound: null,
+    soundName: null
+  },
+  {
+    id: 'init_mktsell',
+    type: 'MARKET_SELL',
+    label: '시장가 매도',
+    hotkey: { key: '2', ctrl: true, shift: true, alt: false },
+    percentage: 5,
+    sound: null,
+    soundName: null
+  },
+  {
+    id: 'init_closeall',
+    type: 'CLOSE_ALL',
+    label: '전체 청산',
+    hotkey: { key: 'c', ctrl: true, shift: true, alt: false },
+    percentage: 100,
+    sound: null,
+    soundName: null
+  }
+];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let currentSettings = null;
-let recordingSlotId = null; // Which slot is currently recording a hotkey
+let currentActions = [];     // Array of action objects (in-memory, mirrors DOM)
+let recordingId = null;      // ID of the action card currently recording a hotkey
 
-// ── DOM helpers ───────────────────────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────────────────────────
 
 const $ = id => document.getElementById(id);
-const slots_container = () => $('slots-container');
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
 
 // ── Hotkey formatting ──────────────────────────────────────────────────────────
 
-/**
- * Format a hotkey config object into a human-readable string.
- * @param {{ key: string, ctrl: boolean, shift: boolean, alt: boolean }} hotkey
- * @returns {string}
- */
 function formatHotkey(hotkey) {
   if (!hotkey || !hotkey.key) return '(없음)';
   const parts = [];
@@ -62,91 +94,66 @@ function formatHotkey(hotkey) {
   return parts.join('+');
 }
 
-/**
- * Convert a KeyboardEvent to a hotkey config object.
- * @param {KeyboardEvent} e
- * @returns {{ key: string, ctrl: boolean, shift: boolean, alt: boolean }|null}
- */
 function eventToHotkey(e) {
-  // Ignore pure modifier presses
   if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) return null;
-  // Require at least one modifier for safety (prevent intercepting normal typing)
   if (!e.ctrlKey && !e.shiftKey && !e.altKey) return null;
   return {
-    key: e.key.toLowerCase(),
-    ctrl: e.ctrlKey,
+    key:   e.key.toLowerCase(),
+    ctrl:  e.ctrlKey,
     shift: e.shiftKey,
-    alt: e.altKey
+    alt:   e.altKey
   };
 }
 
-// ── Slot row rendering ─────────────────────────────────────────────────────────
+// ── Action card rendering ──────────────────────────────────────────────────────
 
 /**
- * Build and return a slot row element.
- * @param {object} slot
+ * Build and return a single action card element.
+ * @param {object} action
  * @returns {HTMLElement}
  */
-function renderSlotRow(slot) {
-  const row = document.createElement('div');
-  row.className = `slot-row${slot.enabled ? '' : ' slot-row--disabled'}`;
-  row.dataset.id = slot.id;
+function renderActionCard(action) {
+  const typeDef = ACTION_TYPES.find(t => t.type === action.type) || { hasPct: true };
 
-  // Toggle
-  const toggleLabel = document.createElement('label');
-  toggleLabel.className = 'toggle';
-  const toggleInput = document.createElement('input');
-  toggleInput.type = 'checkbox';
-  toggleInput.checked = slot.enabled;
-  toggleInput.addEventListener('change', () => {
-    row.classList.toggle('slot-row--disabled', !toggleInput.checked);
-  });
-  const toggleTrack = document.createElement('span');
-  toggleTrack.className = 'toggle__track';
-  toggleLabel.appendChild(toggleInput);
-  toggleLabel.appendChild(toggleTrack);
+  const card = document.createElement('div');
+  card.className = 'action-card';
+  card.dataset.id = action.id;
+
+  // Top row
+  const row = document.createElement('div');
+  row.className = 'action-card__row';
 
   // Label
-  const label = document.createElement('span');
-  label.className = 'slot-label';
-  label.textContent = slot.label;
+  const labelEl = document.createElement('span');
+  labelEl.className = 'action-card__label';
+  labelEl.textContent = action.label;
 
-  // Hotkey input (click-to-record)
-  const hotkeyInput = document.createElement('div');
-  hotkeyInput.className = 'hotkey-input';
-  hotkeyInput.tabIndex = 0;
-  hotkeyInput.textContent = formatHotkey(slot.hotkey);
-  hotkeyInput.dataset.hotkey = JSON.stringify(slot.hotkey);
+  // Hotkey input
+  const hotkeyEl = document.createElement('div');
+  hotkeyEl.className = 'hotkey-input';
+  hotkeyEl.tabIndex = 0;
+  hotkeyEl.textContent = formatHotkey(action.hotkey);
+  hotkeyEl.dataset.hotkey = JSON.stringify(action.hotkey || {});
+  hotkeyEl.title = '클릭 후 키 입력';
 
-  hotkeyInput.addEventListener('click', () => startRecording(slot.id, hotkeyInput));
-  hotkeyInput.addEventListener('keydown', (e) => {
-    if (recordingSlotId === slot.id) {
+  hotkeyEl.addEventListener('click', () => startRecording(action.id, hotkeyEl));
+  hotkeyEl.addEventListener('keydown', (e) => {
+    if (recordingId === action.id) {
       e.preventDefault();
       e.stopPropagation();
       const hk = eventToHotkey(e);
-      if (hk) {
-        stopRecording(slot.id, hotkeyInput, hk);
-      }
+      if (hk) stopRecording(action.id, hotkeyEl, hk);
     } else if (e.key === 'Enter' || e.key === ' ') {
-      startRecording(slot.id, hotkeyInput);
+      startRecording(action.id, hotkeyEl);
     }
   });
-
-  // Blur cancels recording
-  hotkeyInput.addEventListener('blur', () => {
-    if (recordingSlotId === slot.id) {
-      cancelRecording(slot.id, hotkeyInput);
-    }
+  hotkeyEl.addEventListener('blur', () => {
+    if (recordingId === action.id) cancelRecording(action.id, hotkeyEl);
   });
 
-  // Percentage input (hidden for CANCEL_LAST, CANCEL_ALL, CHASE_ORDER)
+  // Percentage wrapper
   const pctWrapper = document.createElement('div');
-  pctWrapper.className = 'pct-wrapper';
-
-  const NO_PCT_ACTIONS = ['CANCEL_LAST', 'CANCEL_ALL', 'CHASE_ORDER'];
-  if (NO_PCT_ACTIONS.includes(slot.id)) {
-    pctWrapper.style.visibility = 'hidden';
-  }
+  pctWrapper.className = 'pct-wrapper' + (typeDef.hasPct ? '' : ' pct-wrapper--hidden');
 
   const pctInput = document.createElement('input');
   pctInput.type = 'number';
@@ -154,8 +161,7 @@ function renderSlotRow(slot) {
   pctInput.min = 1;
   pctInput.max = 100;
   pctInput.step = 1;
-  pctInput.value = slot.percentage;
-  pctInput.placeholder = '5';
+  pctInput.value = typeDef.hasPct ? (action.percentage || 5) : 0;
 
   const pctUnit = document.createElement('span');
   pctUnit.className = 'pct-unit';
@@ -164,40 +170,140 @@ function renderSlotRow(slot) {
   pctWrapper.appendChild(pctInput);
   pctWrapper.appendChild(pctUnit);
 
-  row.appendChild(toggleLabel);
-  row.appendChild(label);
-  row.appendChild(hotkeyInput);
-  row.appendChild(pctWrapper);
+  // Sound controls (upload + play)
+  const soundControls = document.createElement('div');
+  soundControls.className = 'sound-controls';
 
-  return row;
+  const uploadBtn = document.createElement('button');
+  uploadBtn.className = 'btn-icon' + (action.sound ? ' has-sound' : '');
+  uploadBtn.title = action.soundName || '소리 업로드 (mp3/wav/ogg)';
+  uploadBtn.textContent = '🔊';
+
+  const playBtn = document.createElement('button');
+  playBtn.className = 'btn-icon';
+  playBtn.title = '소리 미리 듣기';
+  playBtn.textContent = '▶';
+  playBtn.style.display = action.sound ? '' : 'none';
+
+  // Hidden file input for sound upload
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'audio/mp3,audio/wav,audio/ogg,audio/*';
+  fileInput.style.display = 'none';
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      showFeedback('경고: 파일이 1MB를 초과합니다. 저장되지만 느릴 수 있습니다.', 'error');
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target.result;
+      // Update in-memory action
+      const idx = currentActions.findIndex(a => a.id === action.id);
+      if (idx !== -1) {
+        currentActions[idx].sound = dataUrl;
+        currentActions[idx].soundName = file.name;
+      }
+      // Update this card's action reference too (for preview)
+      action.sound = dataUrl;
+      action.soundName = file.name;
+
+      uploadBtn.classList.add('has-sound');
+      uploadBtn.title = file.name;
+      playBtn.style.display = '';
+      updateSoundName(card, file.name);
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (!action.sound) return;
+    try {
+      new Audio(action.sound).play().catch(err => {
+        showFeedback(`소리 재생 오류: ${err.message}`, 'error');
+      });
+    } catch (err) {
+      showFeedback(`소리 재생 오류: ${err.message}`, 'error');
+    }
+  });
+
+  soundControls.appendChild(uploadBtn);
+  soundControls.appendChild(playBtn);
+  soundControls.appendChild(fileInput);
+
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'btn-icon btn-delete';
+  deleteBtn.title = '삭제';
+  deleteBtn.textContent = '✕';
+  deleteBtn.addEventListener('click', () => removeAction(action.id));
+
+  row.appendChild(labelEl);
+  row.appendChild(hotkeyEl);
+  row.appendChild(pctWrapper);
+  row.appendChild(soundControls);
+  row.appendChild(deleteBtn);
+
+  card.appendChild(row);
+
+  // Sound name display (if already has a sound)
+  if (action.soundName) {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'action-card__sound-name';
+    nameEl.textContent = `🔊 ${action.soundName}`;
+    card.appendChild(nameEl);
+  }
+
+  return card;
+}
+
+/**
+ * Update (or add) the sound name bar on an existing card.
+ */
+function updateSoundName(card, soundName) {
+  let nameEl = card.querySelector('.action-card__sound-name');
+  if (!nameEl) {
+    nameEl = document.createElement('div');
+    nameEl.className = 'action-card__sound-name';
+    card.appendChild(nameEl);
+  }
+  nameEl.textContent = soundName ? `🔊 ${soundName}` : '';
 }
 
 // ── Hotkey recording ──────────────────────────────────────────────────────────
 
-function startRecording(slotId, el) {
+function startRecording(actionId, el) {
   // Cancel any existing recording
-  if (recordingSlotId && recordingSlotId !== slotId) {
-    const prev = slots_container().querySelector(`[data-id="${recordingSlotId}"] .hotkey-input`);
-    if (prev) cancelRecording(recordingSlotId, prev);
+  if (recordingId && recordingId !== actionId) {
+    const prevCard = $('actions-list').querySelector(`[data-id="${recordingId}"]`);
+    if (prevCard) {
+      const prevEl = prevCard.querySelector('.hotkey-input');
+      if (prevEl) cancelRecording(recordingId, prevEl);
+    }
   }
-
-  recordingSlotId = slotId;
+  recordingId = actionId;
   el.classList.add('recording');
   el.textContent = '키 입력...';
   el.focus();
 }
 
-function stopRecording(slotId, el, hotkey) {
-  recordingSlotId = null;
+function stopRecording(actionId, el, hotkey) {
+  recordingId = null;
   el.classList.remove('recording');
   el.dataset.hotkey = JSON.stringify(hotkey);
   el.textContent = formatHotkey(hotkey);
 }
 
-function cancelRecording(slotId, el) {
-  recordingSlotId = null;
+function cancelRecording(actionId, el) {
+  recordingId = null;
   el.classList.remove('recording');
-  // Restore previous value
   try {
     const hk = JSON.parse(el.dataset.hotkey);
     el.textContent = formatHotkey(hk);
@@ -206,56 +312,126 @@ function cancelRecording(slotId, el) {
   }
 }
 
-// ── Render all slots ──────────────────────────────────────────────────────────
+// ── Actions list rendering ─────────────────────────────────────────────────────
 
-function renderSlots(slots) {
-  const container = slots_container();
-  container.innerHTML = '';
-  for (const slot of slots) {
-    container.appendChild(renderSlotRow(slot));
+function renderActionsList() {
+  const list = $('actions-list');
+  list.innerHTML = '';
+
+  for (const action of currentActions) {
+    list.appendChild(renderActionCard(action));
+  }
+
+  updateEmptyState();
+}
+
+function updateEmptyState() {
+  const isEmpty = currentActions.length === 0;
+  $('actions-empty').style.display = isEmpty ? '' : 'none';
+  $('actions-list').style.display  = isEmpty ? 'none' : '';
+}
+
+// ── Add / Remove actions ───────────────────────────────────────────────────────
+
+function addAction(typeDef) {
+  const newAction = {
+    id:         generateId(),
+    type:       typeDef.type,
+    label:      typeDef.label,
+    hotkey:     { key: '', ctrl: false, shift: false, alt: false },
+    percentage: typeDef.hasPct ? 5 : 0,
+    sound:      null,
+    soundName:  null
+  };
+  currentActions.push(newAction);
+  const card = renderActionCard(newAction);
+  const list = $('actions-list');
+  list.appendChild(card);
+  updateEmptyState();
+  // Scroll to the new card
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function removeAction(actionId) {
+  currentActions = currentActions.filter(a => a.id !== actionId);
+  const card = $('actions-list').querySelector(`[data-id="${actionId}"]`);
+  if (card) card.remove();
+  updateEmptyState();
+}
+
+// ── Modal (action type picker) ─────────────────────────────────────────────────
+
+function openModal() {
+  $('modal-backdrop').style.display = 'flex';
+}
+
+function closeModal() {
+  $('modal-backdrop').style.display = 'none';
+}
+
+function buildModalGrid() {
+  const grid = $('action-type-grid');
+  grid.innerHTML = '';
+  for (const typeDef of ACTION_TYPES) {
+    const btn = document.createElement('button');
+    btn.className = 'action-type-btn';
+    btn.textContent = typeDef.label;
+    btn.addEventListener('click', () => {
+      closeModal();
+      addAction(typeDef);
+    });
+    grid.appendChild(btn);
   }
 }
 
-// ── Read values from DOM ───────────────────────────────────────────────────────
+// ── Collect values from DOM ────────────────────────────────────────────────────
 
 /**
- * Collect current slot values from the DOM.
- * @returns {object[]}
+ * Reads latest hotkey + pct values from each card DOM element,
+ * merges with currentActions (which already has sound data), and returns array.
  */
-function collectSlots() {
-  const rows = slots_container().querySelectorAll('.slot-row');
-  return Array.from(rows).map(row => {
-    const id = row.dataset.id;
-    const enabled = row.querySelector('input[type="checkbox"]').checked;
-    const hotkeyEl = row.querySelector('.hotkey-input');
+function collectActions() {
+  const list = $('actions-list');
+  const cards = list.querySelectorAll('.action-card');
+  return Array.from(cards).map(card => {
+    const id = card.dataset.id;
+    const existing = currentActions.find(a => a.id === id) || {};
+
+    const hotkeyEl = card.querySelector('.hotkey-input');
     let hotkey = { key: '', ctrl: false, shift: false, alt: false };
     try { hotkey = JSON.parse(hotkeyEl.dataset.hotkey); } catch {}
-    const pctInput = row.querySelector('.pct-input');
-    const percentage = pctInput ? parseInt(pctInput.value, 10) || 0 : 0;
-    const defaultSlot = DEFAULT_SLOTS.find(s => s.id === id) || {};
-    return { id, label: defaultSlot.label || id, hotkey, percentage, enabled };
+
+    const pctInput = card.querySelector('.pct-input');
+    const rawPct = pctInput ? (parseInt(pctInput.value, 10) || 0) : 0;
+    const actionTypeDef = ACTION_TYPES.find(t => t.type === (existing.type || '')) || { hasPct: true };
+    const percentage = actionTypeDef.hasPct ? rawPct : 0;
+
+    return {
+      id:        id,
+      type:      existing.type || '',
+      label:     existing.label || '',
+      hotkey:    hotkey,
+      percentage: percentage,
+      sound:     existing.sound || null,
+      soundName: existing.soundName || null
+    };
   });
 }
 
-/**
- * Collect general settings from DOM.
- */
 function collectGeneral() {
   return {
-    overlayDuration: parseInt($('overlay-duration').value, 10) || 2000,
-    seedCap: parseFloat($('seed-cap').value) || 0,
-    confirmDangerous: $('confirm-dangerous').checked,
-    soundEnabled: $('sound-enabled').checked
+    soundEnabled:  $('sound-enabled').checked,
+    seedCap:       parseFloat($('seed-cap').value) || 0,
+    donationMode:  $('donation-mode').checked
   };
 }
 
-// ── Populate general settings into DOM ────────────────────────────────────────
+// ── Populate DOM from settings ─────────────────────────────────────────────────
 
 function populateGeneral(general) {
-  $('overlay-duration').value = general.overlayDuration || 2000;
-  $('seed-cap').value = general.seedCap || 0;
-  $('confirm-dangerous').checked = !!general.confirmDangerous;
+  $('seed-cap').value        = general.seedCap !== undefined ? general.seedCap : 0;
   $('sound-enabled').checked = !!general.soundEnabled;
+  $('donation-mode').checked = !!general.donationMode;
 }
 
 // ── Storage operations ────────────────────────────────────────────────────────
@@ -264,15 +440,44 @@ async function loadSettings() {
   return new Promise(resolve => {
     chrome.storage.local.get(['settings'], result => {
       const saved = result.settings;
+
       if (!saved) {
-        resolve({ slots: DEFAULT_SLOTS.map(s => ({ ...s })), general: { ...DEFAULT_GENERAL } });
+        resolve({
+          actions: DEFAULT_ACTIONS.map(a => ({ ...a })),
+          general: { ...DEFAULT_GENERAL }
+        });
         return;
       }
-      const slots = DEFAULT_SLOTS.map(def => {
-        const s = saved.slots && saved.slots.find(sl => sl.id === def.id);
-        return s ? { ...def, ...s } : { ...def };
+
+      // Migrate v1 slots → v2 actions
+      if (saved.slots && !saved.actions) {
+        const actions = saved.slots.map(slot => ({
+          id:         generateId(),
+          type:       slot.id,
+          label:      slot.label || slot.id,
+          hotkey:     slot.hotkey || { key: '', ctrl: false, shift: false, alt: false },
+          percentage: slot.percentage || 0,
+          sound:      null,
+          soundName:  null
+        }));
+        const oldGeneral = saved.general || {};
+        const migratedResult = {
+          actions,
+          general: {
+            soundEnabled: oldGeneral.soundEnabled !== undefined ? oldGeneral.soundEnabled : true,
+            seedCap:      oldGeneral.seedCap || 0,
+            donationMode: false
+          }
+        };
+        chrome.storage.local.set({ settings: migratedResult });
+        resolve(migratedResult);
+        return;
+      }
+
+      resolve({
+        actions: Array.isArray(saved.actions) ? saved.actions : [],
+        general: { ...DEFAULT_GENERAL, ...(saved.general || {}) }
       });
-      resolve({ slots, general: { ...DEFAULT_GENERAL, ...(saved.general || {}) } });
     });
   });
 }
@@ -289,53 +494,110 @@ async function saveSettings(settings) {
 // ── Status query ──────────────────────────────────────────────────────────────
 
 function queryStatus() {
-  const dot = document.querySelector('.status-dot');
+  const dot  = document.querySelector('.status-dot');
   const text = document.querySelector('.status-text');
-  const pageInfo = $('page-info');
+  const info = $('page-info');
 
   chrome.runtime.sendMessage({ type: 'QUERY_STATUS' }, (response) => {
     if (chrome.runtime.lastError || !response) {
-      dot.className = 'status-dot disconnected';
+      dot.className   = 'status-dot disconnected';
       text.textContent = 'OKX 탭 없음';
-      pageInfo.style.display = 'none';
+      info.style.display = 'none';
       return;
     }
-
     if (response.ready) {
-      dot.className = 'status-dot connected';
+      dot.className   = 'status-dot connected';
       text.textContent = '연결됨';
-      pageInfo.style.display = 'flex';
-      $('page-type-label').textContent = response.pageType === 'spot' ? '현물' : '선물/스왑';
-      $('trading-mode-label').textContent = response.tradingMode === 'hedge' ? '헤지 모드' : response.tradingMode === 'one-way' ? '단방향 모드' : response.tradingMode;
+      info.style.display = 'flex';
+      $('page-type-label').textContent    = response.pageType === 'spot' ? '현물' : '선물/스왑';
+      $('trading-mode-label').textContent = response.tradingMode === 'hedge' ? '헤지 모드'
+        : response.tradingMode === 'one-way' ? '단방향 모드'
+        : response.tradingMode;
     } else {
-      dot.className = 'status-dot disconnected';
+      dot.className   = 'status-dot disconnected';
       text.textContent = '콘텐츠 스크립트 없음';
-      pageInfo.style.display = 'none';
+      info.style.display = 'none';
     }
   });
 }
 
-// ── Feedback display ──────────────────────────────────────────────────────────
+// ── Feedback ──────────────────────────────────────────────────────────────────
 
 function showFeedback(message, type = 'success') {
   const el = $('feedback');
   el.textContent = message;
   el.className = `feedback ${type}`;
   el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 2500);
+  setTimeout(() => { el.style.display = 'none'; }, 2800);
 }
 
-// ── Event listeners ───────────────────────────────────────────────────────────
+// ── Global keydown (hotkey recording capture) ─────────────────────────────────
+
+document.addEventListener('keydown', (e) => {
+  if (!recordingId) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  const hk = eventToHotkey(e);
+  if (!hk) return;
+
+  const card = $('actions-list').querySelector(`[data-id="${recordingId}"]`);
+  if (card) {
+    const hotkeyEl = card.querySelector('.hotkey-input');
+    if (hotkeyEl) stopRecording(recordingId, hotkeyEl, hk);
+  }
+}, true);
+
+// Cancel recording on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && recordingId) {
+    const card = $('actions-list').querySelector(`[data-id="${recordingId}"]`);
+    if (card) {
+      const hotkeyEl = card.querySelector('.hotkey-input');
+      if (hotkeyEl) cancelRecording(recordingId, hotkeyEl);
+    }
+  }
+});
+
+// ── Button event listeners ────────────────────────────────────────────────────
+
+$('btn-add-action').addEventListener('click', openModal);
+$('modal-cancel').addEventListener('click', closeModal);
+$('modal-backdrop').addEventListener('click', (e) => {
+  if (e.target === $('modal-backdrop')) closeModal();
+});
 
 $('btn-save').addEventListener('click', async () => {
   try {
     const settings = {
-      slots: collectSlots(),
+      actions: collectActions(),
       general: collectGeneral()
     };
+
+    // W3: Storage quota guard (~8MB limit)
+    if (JSON.stringify(settings).length > 8_000_000) {
+      showFeedback('저장 실패: 음원 파일이 너무 큽니다. 일부 소리를 제거하세요.', 'error');
+      return;
+    }
+
+    // M3: Duplicate hotkey detection (warning only, does not block save)
+    const combos = settings.actions
+      .map(a => a.hotkey && a.hotkey.key ? formatHotkey(a.hotkey) : null)
+      .filter(c => c && c !== '(없음)');
+    const seen = new Set();
+    const duplicates = new Set();
+    for (const combo of combos) {
+      if (seen.has(combo)) duplicates.add(combo);
+      else seen.add(combo);
+    }
+    if (duplicates.size > 0) {
+      showFeedback(`중복 단축키가 있습니다: ${[...duplicates].join(', ')}`, 'error');
+    }
+
+    // Sync currentActions with collected (ensures sound data is preserved)
+    currentActions = settings.actions;
     await saveSettings(settings);
-    currentSettings = settings;
-    showFeedback('설정 저장 완료', 'success');
+    if (duplicates.size === 0) showFeedback('설정 저장 완료', 'success');
   } catch (err) {
     showFeedback(`저장 실패: ${err.message}`, 'error');
   }
@@ -343,11 +605,14 @@ $('btn-save').addEventListener('click', async () => {
 
 $('btn-reset').addEventListener('click', async () => {
   if (!confirm('모든 설정을 초기값으로 되돌릴까요?')) return;
-  const defaults = { slots: DEFAULT_SLOTS.map(s => ({ ...s })), general: { ...DEFAULT_GENERAL } };
+  const defaults = {
+    actions: DEFAULT_ACTIONS.map(a => ({ ...a, id: generateId() })),
+    general: { ...DEFAULT_GENERAL }
+  };
   try {
     await saveSettings(defaults);
-    currentSettings = defaults;
-    renderSlots(defaults.slots);
+    currentActions = defaults.actions;
+    renderActionsList();
     populateGeneral(defaults.general);
     showFeedback('초기화 완료', 'success');
   } catch (err) {
@@ -355,33 +620,15 @@ $('btn-reset').addEventListener('click', async () => {
   }
 });
 
-// Global keydown for recording (capture phase)
-document.addEventListener('keydown', (e) => {
-  if (!recordingSlotId) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-
-  const hk = eventToHotkey(e);
-  if (!hk) return;
-
-  const hotkeyEl = slots_container().querySelector(`[data-id="${recordingSlotId}"] .hotkey-input`);
-  if (hotkeyEl) stopRecording(recordingSlotId, hotkeyEl, hk);
-}, true);
-
-// Cancel recording on Escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && recordingSlotId) {
-    const hotkeyEl = slots_container().querySelector(`[data-id="${recordingSlotId}"] .hotkey-input`);
-    if (hotkeyEl) cancelRecording(recordingSlotId, hotkeyEl);
-  }
-});
-
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
-  currentSettings = await loadSettings();
-  renderSlots(currentSettings.slots);
-  populateGeneral(currentSettings.general);
+  buildModalGrid();
+
+  const settings = await loadSettings();
+  currentActions = settings.actions;
+  renderActionsList();
+  populateGeneral(settings.general);
   queryStatus();
 }
 

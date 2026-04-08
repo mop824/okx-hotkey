@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="app">
+
     <!-- Header -->
     <header class="header">
       <div class="header__logo">⚡ OKX Hotkey</div>
@@ -23,31 +24,35 @@
       <span id="trading-mode-label"></span>
     </div>
 
-    <!-- Slot list -->
+    <!-- Actions list -->
     <section class="section">
-      <div class="section__title">단축키 슬롯</div>
-      <div class="slots" id="slots-container">
+      <div class="section__header">
+        <div class="section__title">단축키 액션</div>
+        <button class="btn btn--add" id="btn-add-action">+ 액션 추가</button>
+      </div>
+      <div class="actions-list" id="actions-list">
         <!-- Populated by popup.js -->
       </div>
+      <div class="actions-empty" id="actions-empty" style="display:none">
+        액션이 없습니다. "+ 액션 추가" 버튼으로 추가하세요.
+      </div>
     </section>
+
+    <!-- Action type picker modal (hidden by default) -->
+    <div class="modal-backdrop" id="modal-backdrop" style="display:none">
+      <div class="modal">
+        <div class="modal__title">액션 유형 선택</div>
+        <div class="action-type-grid" id="action-type-grid">
+          <!-- Populated by popup.js -->
+        </div>
+        <button class="btn btn--secondary modal__cancel" id="modal-cancel">취소</button>
+      </div>
+    </div>
 
     <!-- General settings -->
     <section class="section">
       <div class="section__title">일반 설정</div>
       <div class="general-settings">
-
-        <div class="setting-row">
-          <label class="setting-label" for="overlay-duration">알림 표시 시간 (ms)</label>
-          <input
-            type="number"
-            id="overlay-duration"
-            class="input input--small"
-            min="500"
-            max="10000"
-            step="100"
-            placeholder="2000"
-          />
-        </div>
 
         <div class="setting-row">
           <label class="setting-label" for="seed-cap">최대 운용 시드 (USD)</label>
@@ -57,22 +62,22 @@
             class="input input--small"
             min="0"
             step="1"
-            placeholder="0 = 전체 잔액 사용"
+            placeholder="0 = 전체 잔액"
           />
         </div>
 
         <div class="setting-row">
-          <label class="setting-label" for="confirm-dangerous">위험 동작 재확인</label>
+          <label class="setting-label" for="sound-enabled">소리 활성화 (전역)</label>
           <label class="toggle">
-            <input type="checkbox" id="confirm-dangerous" />
+            <input type="checkbox" id="sound-enabled" />
             <span class="toggle__track"></span>
           </label>
         </div>
 
         <div class="setting-row">
-          <label class="setting-label" for="sound-enabled">소리 활성화</label>
+          <label class="setting-label" for="donation-mode">😂 Donation 모드</label>
           <label class="toggle">
-            <input type="checkbox" id="sound-enabled" />
+            <input type="checkbox" id="donation-mode" />
             <span class="toggle__track"></span>
           </label>
         </div>
@@ -80,14 +85,15 @@
       </div>
     </section>
 
-    <!-- Buttons -->
-    <div class="actions">
+    <!-- Footer buttons -->
+    <div class="footer-actions">
       <button class="btn btn--secondary" id="btn-reset">초기화</button>
       <button class="btn btn--primary" id="btn-save">저장</button>
     </div>
 
     <!-- Feedback message -->
     <div class="feedback" id="feedback" style="display:none"></div>
+
   </div>
 
   <script src="popup.js"></script>

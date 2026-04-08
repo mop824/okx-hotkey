@@ -3,9 +3,13 @@
  *
  * Responsibilities:
  * 1. Init: load settings, set up hotkey listeners
- * 2. Hotkey dispatch: match key combo to slot, execute action
- * 3. SPA navigation: MutationObserver re-detects page type on URL change
- * 4. Graceful error handling with overlay feedback
+ * 2. Hotkey dispatch: match key combo to action, execute
+ * 3. Sound playback: per-action base64 audio after successful execution
+ * 4. Donation mode: replace buy/sell button text via MutationObserver
+ * 5. SPA navigation: MutationObserver re-detects page type on URL change
+ *
+ * Storage schema source of truth: getDefaultSettings() and migrateFromSlots() in this file.
+ * popup/popup.js is the other authoritative copy — keep in sync manually.
  */
 
 ;(async function OKXHotkeyMain() {
@@ -20,18 +24,30 @@
   let settings = null;
   let detectorState = { pageType: 'unknown', tradingMode: 'unknown', ready: false };
   let hotkeyListener = null;
+  let donationObserver = null;
 
   // ── Settings loading ──────────────────────────────────────────────────────
 
   async function loadSettings() {
     try {
-      settings = await chrome.storage.local.get(['settings']).then(r => {
-        if (!r.settings) return getDefaultSettings();
-        return mergeWithDefaults(r.settings);
-      });
+      const result = await chrome.storage.local.get(['settings']);
+      if (!result.settings) {
+        settings = getDefaultSettings();
+        return;
+      }
+      const saved = result.settings;
 
-      // Apply overlay duration
-      OKXOverlay.setDuration(settings.general.overlayDuration);
+      // Migrate v1 slots → v2 actions if needed
+      if (saved.slots && !saved.actions) {
+        settings = migrateFromSlots(saved);
+        chrome.storage.local.set({ settings });
+        return;
+      }
+
+      settings = {
+        actions: Array.isArray(saved.actions) ? saved.actions : [],
+        general: { ...getDefaultSettings().general, ...(saved.general || {}) }
+      };
     } catch (err) {
       console.error('[OKX Hotkey] Failed to load settings:', err);
       settings = getDefaultSettings();
@@ -40,111 +56,94 @@
 
   function getDefaultSettings() {
     return {
-      slots: [
-        { id: 'MARKET_BUY',    label: '시장가 매수',       hotkey: { key: '1', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'MARKET_SELL',   label: '시장가 매도',       hotkey: { key: '2', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'LIMIT_BUY',     label: '지정가 매수',       hotkey: { key: '3', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'LIMIT_SELL',    label: '지정가 매도',       hotkey: { key: '4', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'TICK_BUY',      label: '틱 매수',           hotkey: { key: 'q', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'TICK_SELL',     label: '틱 매도',           hotkey: { key: 'w', ctrl: true,  shift: true,  alt: false }, percentage: 5,   enabled: true },
-        { id: 'PARTIAL_CLOSE', label: '부분 청산',         hotkey: { key: 'z', ctrl: true,  shift: true,  alt: false }, percentage: 50,  enabled: true },
-        { id: 'CLOSE_PAIR',    label: '페어 청산',         hotkey: { key: 'x', ctrl: true,  shift: true,  alt: false }, percentage: 100, enabled: true },
-        { id: 'CLOSE_ALL',     label: '전체 청산',         hotkey: { key: 'c', ctrl: true,  shift: true,  alt: false }, percentage: 100, enabled: true },
-        { id: 'FLIP',          label: '포지션 반전',       hotkey: { key: 'f', ctrl: true,  shift: true,  alt: false }, percentage: 100, enabled: true },
-        { id: 'CANCEL_LAST',   label: '마지막 주문 취소',  hotkey: { key: 'a', ctrl: true,  shift: true,  alt: false }, percentage: 0,   enabled: true },
-        { id: 'CANCEL_ALL',    label: '전체 주문 취소',    hotkey: { key: 's', ctrl: true,  shift: true,  alt: false }, percentage: 0,   enabled: true },
-        { id: 'CHASE_ORDER',   label: '주문 체이스',       hotkey: { key: 'd', ctrl: true,  shift: true,  alt: false }, percentage: 0,   enabled: true },
+      actions: [
+        {
+          id: 'default_mktbuy',
+          type: 'MARKET_BUY',
+          label: '시장가 매수',
+          hotkey: { key: '1', ctrl: true, shift: true, alt: false },
+          percentage: 5,
+          sound: null,
+          soundName: null
+        },
+        {
+          id: 'default_mktsell',
+          type: 'MARKET_SELL',
+          label: '시장가 매도',
+          hotkey: { key: '2', ctrl: true, shift: true, alt: false },
+          percentage: 5,
+          sound: null,
+          soundName: null
+        },
+        {
+          id: 'default_closeall',
+          type: 'CLOSE_ALL',
+          label: '전체 청산',
+          hotkey: { key: 'c', ctrl: true, shift: true, alt: false },
+          percentage: 100,
+          sound: null,
+          soundName: null
+        }
       ],
       general: {
         soundEnabled: true,
-        confirmDangerous: true,
-        overlayDuration: 2000,
-        seedCap: 0
+        seedCap: 0,
+        donationMode: false
       }
     };
   }
 
-  function mergeWithDefaults(saved) {
-    const defaults = getDefaultSettings();
+  function migrateFromSlots(oldSettings) {
+    const actions = (oldSettings.slots || []).map(slot => ({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+      type: slot.id,
+      label: slot.label || slot.id,
+      hotkey: slot.hotkey || { key: '', ctrl: false, shift: false, alt: false },
+      percentage: slot.percentage || 0,
+      sound: null,
+      soundName: null
+    }));
+    const oldGeneral = oldSettings.general || {};
     return {
-      slots: defaults.slots.map(def => {
-        const s = saved.slots && saved.slots.find(sl => sl.id === def.id);
-        return s ? { ...def, ...s } : { ...def };
-      }),
-      general: { ...defaults.general, ...(saved.general || {}) }
+      actions,
+      general: {
+        soundEnabled: oldGeneral.soundEnabled !== undefined ? oldGeneral.soundEnabled : true,
+        seedCap: oldGeneral.seedCap || 0,
+        donationMode: false
+      }
     };
   }
 
   // ── Hotkey matching ───────────────────────────────────────────────────────
 
-  /**
-   * Normalize a key from KeyboardEvent.
-   * Returns lowercase letter/digit or special key name.
-   * @param {KeyboardEvent} e
-   * @returns {string}
-   */
   function normalizeKey(e) {
-    // Digits/letters: use e.key.toLowerCase()
-    // Function keys: F1–F12 etc.
     return e.key.toLowerCase();
   }
 
-  /**
-   * Check if a keyboard event matches a saved hotkey config.
-   * @param {KeyboardEvent} e
-   * @param {{ key: string, ctrl: boolean, shift: boolean, alt: boolean }} hotkey
-   * @returns {boolean}
-   */
   function matchesHotkey(e, hotkey) {
     if (!hotkey || !hotkey.key) return false;
     return (
       normalizeKey(e) === hotkey.key.toLowerCase() &&
-      !!e.ctrlKey === !!hotkey.ctrl &&
+      !!e.ctrlKey  === !!hotkey.ctrl  &&
       !!e.shiftKey === !!hotkey.shift &&
-      !!e.altKey === !!hotkey.alt &&
-      !e.metaKey // don't match with Meta/Cmd key
+      !!e.altKey   === !!hotkey.alt   &&
+      !e.metaKey
     );
   }
 
-  // ── Dangerous action confirmation ─────────────────────────────────────────
+  // ── Sound playback ────────────────────────────────────────────────────────
 
-  const DANGEROUS_ACTIONS = new Set(['CLOSE_ALL', 'FLIP', 'CANCEL_ALL']);
-
-  async function confirmIfDangerous(slot) {
-    if (!settings.general.confirmDangerous) return true;
-    if (!DANGEROUS_ACTIONS.has(slot.id)) return true;
-
-    return new Promise(resolve => {
-      // Show a confirm overlay with countdown
-      const toast = OKXOverlay.show(
-        `${slot.label} — 다시 누르면 실행 (2초 내)`,
-        'info',
-        0 // no auto-dismiss
-      );
-
-      let confirmed = false;
-
-      const confirmHandler = (e) => {
-        if (matchesHotkey(e, slot.hotkey)) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          confirmed = true;
-          document.removeEventListener('keydown', confirmHandler, true);
-          OKXOverlay.dismiss(toast);
-          resolve(true);
-        }
-      };
-
-      document.addEventListener('keydown', confirmHandler, true);
-
-      setTimeout(() => {
-        if (!confirmed) {
-          document.removeEventListener('keydown', confirmHandler, true);
-          OKXOverlay.dismiss(toast);
-          resolve(false);
-        }
-      }, 2000);
-    });
+  function playActionSound(action) {
+    if (!settings.general.soundEnabled) return;
+    if (!action.sound) return;
+    try {
+      const audio = new Audio(action.sound);
+      audio.play().catch(err => {
+        console.warn('[OKX Hotkey] Sound playback failed:', err);
+      });
+    } catch (err) {
+      console.warn('[OKX Hotkey] Sound init failed:', err);
+    }
   }
 
   // ── Hotkey handler ────────────────────────────────────────────────────────
@@ -152,7 +151,6 @@
   async function handleKeydown(e) {
     if (!settings) return;
 
-    // Don't intercept if user is typing in an input (other than OKX's own inputs)
     const target = e.target;
     const isTextInput = (
       (target.tagName === 'INPUT' && !target.closest('[class*="tradePanel"]')) ||
@@ -161,22 +159,20 @@
     );
     if (isTextInput) return;
 
-    for (const slot of settings.slots) {
-      if (!slot.enabled) continue;
-      if (!matchesHotkey(e, slot.hotkey)) continue;
+    for (const action of settings.actions) {
+      if (!matchesHotkey(e, action.hotkey)) continue;
 
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      await executeSlot(slot);
+      await executeAction(action);
       break;
     }
   }
 
   // ── Action execution ──────────────────────────────────────────────────────
 
-  async function executeSlot(slot) {
-    // Re-detect page state fresh on each execution
+  async function executeAction(action) {
     detectorState = OKXDetector.getState();
 
     if (!detectorState.ready) {
@@ -184,29 +180,22 @@
       return;
     }
 
-    // Confirm dangerous actions
-    const proceed = await confirmIfDangerous(slot);
-    if (!proceed) {
-      OKXOverlay.show('취소됨', 'info');
-      return;
-    }
-
-    // Show loading toast
-    const toast = OKXOverlay.loading(`${slot.label} ${slot.percentage > 0 ? slot.percentage + '%' : ''} 실행 중...`);
+    const pctLabel = action.percentage > 0 ? ` ${action.percentage}%` : '';
+    const toast = OKXOverlay.loading(`${action.label}${pctLabel} 실행 중...`);
 
     try {
       const ctx = {
-        pageType: detectorState.pageType,
+        pageType:    detectorState.pageType,
         tradingMode: detectorState.tradingMode,
-        percentage: slot.percentage,
-        seedCap: settings.general.seedCap || 0,
-        overlay: OKXOverlay
+        percentage:  action.percentage,
+        seedCap:     settings.general.seedCap || 0
       };
 
-      const result = await OKXActions.execute(slot.id, ctx);
-      OKXOverlay.update(toast, result || `${slot.label} 완료`, 'success');
+      const result = await OKXActions.execute(action.type, ctx);
+      OKXOverlay.update(toast, result || `${action.label} 완료`, 'success');
+      playActionSound(action);
     } catch (err) {
-      console.error(`[OKX Hotkey] Action ${slot.id} failed:`, err);
+      console.error(`[OKX Hotkey] Action ${action.type} failed:`, err);
       OKXOverlay.update(toast, `오류: ${err.message}`, 'error');
     }
   }
@@ -221,19 +210,82 @@
     document.addEventListener('keydown', hotkeyListener, true);
   }
 
+  // ── Donation mode ─────────────────────────────────────────────────────────
+
+  const DONATION_BUY_PATTERNS  = /^(Buy|매수|Long|Buy\s*\(Long\))$/i;
+  const DONATION_SELL_PATTERNS = /^(Sell|매도|Short|Sell\s*\(Short\))$/i;
+  const DONATION_TEXT = 'Donation';
+
+  /**
+   * Replace buy/sell text nodes inside a button element.
+   * Only replaces text nodes (not icons/children with sub-elements).
+   */
+  function replaceDonationText(el) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    let node;
+    while ((node = walker.nextNode())) {
+      const trimmed = node.textContent.trim();
+      if (DONATION_BUY_PATTERNS.test(trimmed) || DONATION_SELL_PATTERNS.test(trimmed)) {
+        node.textContent = DONATION_TEXT;
+      }
+    }
+  }
+
+  function applyDonationMode() {
+    if (!settings || !settings.general.donationMode) return;
+    const buttons = document.querySelectorAll('button');
+    for (const btn of buttons) {
+      replaceDonationText(btn);
+    }
+  }
+
+  function startDonationObserver() {
+    if (donationObserver) return;
+    applyDonationMode();
+    let donationPending = false;
+    donationObserver = new MutationObserver(() => {
+      if (donationPending) return;
+      donationPending = true;
+      requestAnimationFrame(() => {
+        applyDonationMode();
+        donationPending = false;
+      });
+    });
+    donationObserver.observe(document.body, { childList: true, subtree: true, characterData: false });
+  }
+
+  function stopDonationObserver() {
+    if (donationObserver) {
+      donationObserver.disconnect();
+      donationObserver = null;
+    }
+  }
+
+  function syncDonationMode() {
+    if (settings && settings.general.donationMode) {
+      startDonationObserver();
+    } else {
+      stopDonationObserver();
+    }
+  }
+
   // ── Settings change listener (from popup) ─────────────────────────────────
 
   chrome.storage.onChanged.addListener((changes) => {
-    if (changes.settings) {
-      const saved = changes.settings.newValue;
-      settings = mergeWithDefaults(saved);
-      OKXOverlay.setDuration(settings.general.overlayDuration);
-      console.log('[OKX Hotkey] Settings reloaded from popup');
-    }
+    if (!changes.settings) return;
+    const saved = changes.settings.newValue;
+    if (!saved) return;
+
+    settings = {
+      actions: Array.isArray(saved.actions) ? saved.actions : [],
+      general: { ...getDefaultSettings().general, ...(saved.general || {}) }
+    };
+
+    syncDonationMode();
+    console.log('[OKX Hotkey] Settings reloaded from popup');
   });
 
   // ── SPA navigation detection ──────────────────────────────────────────────
-  // OKX is a SPA — URL changes without full page reload
 
   let lastUrl = window.location.href;
 
@@ -243,6 +295,10 @@
       lastUrl = currentUrl;
       console.log('[OKX Hotkey] SPA navigation detected, re-detecting page...');
       detectorState = OKXDetector.getState();
+      // Re-apply donation mode after navigation
+      if (settings && settings.general.donationMode) {
+        setTimeout(applyDonationMode, 500);
+      }
     }
   });
 
@@ -258,13 +314,13 @@
     console.log('[OKX Hotkey] Detected:', detectorState);
 
     attachKeyListener();
+    syncDonationMode();
 
-    // Listen for messages from background/popup
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (msg.type === 'GET_STATUS') {
         sendResponse({
-          ready: detectorState.ready,
-          pageType: detectorState.pageType,
+          ready:       detectorState.ready,
+          pageType:    detectorState.pageType,
           tradingMode: detectorState.tradingMode
         });
       }
