@@ -321,7 +321,8 @@ window.OKXActions = (() => {
     if (isNaN(bestBid)) throw new Error('Best bid price not readable');
     const tickSize = R.readTickSize();
     const tick = isNaN(tickSize) ? 0.01 : tickSize;
-    const price = parseFloat((bestBid + tick).toFixed(String(tick).split('.')[1]?.length || 2));
+    const ticks = ctx.ticks || 1;
+    const price = parseFloat((bestBid + tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
 
     await E.selectLimitOrder();
 
@@ -368,7 +369,8 @@ window.OKXActions = (() => {
     if (isNaN(bestAsk)) throw new Error('Best ask price not readable');
     const tickSize = R.readTickSize();
     const tick = isNaN(tickSize) ? 0.01 : tickSize;
-    const price = parseFloat((bestAsk - tick).toFixed(String(tick).split('.')[1]?.length || 2));
+    const ticks = ctx.ticks || 1;
+    const price = parseFloat((bestAsk - tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
 
     await E.selectLimitOrder();
 

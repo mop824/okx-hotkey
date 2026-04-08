@@ -290,6 +290,13 @@ window.OKXExecutor = (() => {
     }
     if (!cancelBtn) throw new Error('[OKX Hotkey] cancelOrderRow: cancel button not found');
     cancelBtn.click();
+    await delay(300);
+    // Handle confirmation modal
+    const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
+      const text = btn.textContent.trim().toLowerCase();
+      return text === 'confirm' || text === '확인' || text === 'ok';
+    });
+    if (confirmBtn) confirmBtn.click();
     await delay(100);
   }
 
@@ -307,6 +314,12 @@ window.OKXExecutor = (() => {
         const text = b.textContent.trim().toLowerCase();
         if (text.includes('cancel all') || text.includes('전체 취소')) {
           b.click();
+          await delay(300);
+          const confirmBtn3 = Array.from(document.querySelectorAll('button')).find(btn => {
+            const text = btn.textContent.trim().toLowerCase();
+            return text === 'confirm' || text === '확인' || text === 'ok';
+          });
+          if (confirmBtn3) confirmBtn3.click();
           await delay(100);
           return;
         }
@@ -314,6 +327,12 @@ window.OKXExecutor = (() => {
       throw new Error('[OKX Hotkey] cancelAllOrders: Cancel All button not found');
     }
     btn.click();
+    await delay(300);
+    const confirmBtn2 = Array.from(document.querySelectorAll('button')).find(btn => {
+      const text = btn.textContent.trim().toLowerCase();
+      return text === 'confirm' || text === '확인' || text === 'ok';
+    });
+    if (confirmBtn2) confirmBtn2.click();
     await delay(100);
   }
 

@@ -29,7 +29,8 @@ html {
 }
 
 body {
-  min-width: 560px;
+  min-width: 540px;
+  min-height: 520px;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', monospace, sans-serif;
@@ -162,10 +163,10 @@ body {
   border-color: #3a3e52;
 }
 
-/* Card top row: handle, label, hotkey, pct, sound, delete */
+/* Card top row: handle, label, hotkey, pct, ticks, sound, delete */
 .action-card__row {
   display: grid;
-  grid-template-columns: 16px 1fr 100px 56px 58px 28px;
+  grid-template-columns: 16px 1fr 100px 56px 44px 58px 28px;
   align-items: center;
   gap: 8px;
   padding: 9px 10px;
@@ -255,6 +256,48 @@ body {
 }
 
 .pct-wrapper--hidden {
+  visibility: hidden;
+}
+
+/* ── Ticks input ────────────────────────────────────────────────── */
+
+.ticks-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ticks-input {
+  width: 40px;
+  padding: 5px 22px 5px 6px;
+  font-size: 13px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  text-align: right;
+  -moz-appearance: textfield;
+}
+
+.ticks-input::-webkit-outer-spin-button,
+.ticks-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.ticks-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.ticks-unit {
+  position: absolute;
+  right: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.ticks-wrapper--hidden {
   visibility: hidden;
 }
 

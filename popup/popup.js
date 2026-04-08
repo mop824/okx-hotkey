@@ -22,8 +22,8 @@ const ACTION_TYPES = [
   { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true  },
   { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true  },
   { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true  },
-  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true  },
-  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true  },
+  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true, hasTicks: true  },
+  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true, hasTicks: true  },
   { type: 'PARTIAL_CLOSE', label: '부분 청산',        hasPct: true  },
   { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false },
   { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false },
@@ -113,7 +113,7 @@ function eventToHotkey(e) {
  * @returns {HTMLElement}
  */
 function renderActionCard(action) {
-  const typeDef = ACTION_TYPES.find(t => t.type === action.type) || { hasPct: true };
+  const typeDef = ACTION_TYPES.find(t => t.type === action.type) || { hasPct: true, hasTicks: false };
 
   const card = document.createElement('div');
   card.className = 'action-card';
@@ -227,6 +227,25 @@ function renderActionCard(action) {
   pctWrapper.appendChild(pctInput);
   pctWrapper.appendChild(pctUnit);
 
+  // Ticks wrapper (for TICK_BUY / TICK_SELL only)
+  const ticksWrapper = document.createElement('div');
+  ticksWrapper.className = 'ticks-wrapper' + (typeDef.hasTicks ? '' : ' ticks-wrapper--hidden');
+
+  const ticksInput = document.createElement('input');
+  ticksInput.type = 'number';
+  ticksInput.className = 'ticks-input';
+  ticksInput.min = 1;
+  ticksInput.max = 10;
+  ticksInput.step = 1;
+  ticksInput.value = typeDef.hasTicks ? (action.ticks || 1) : 1;
+
+  const ticksUnit = document.createElement('span');
+  ticksUnit.className = 'ticks-unit';
+  ticksUnit.textContent = '틱';
+
+  ticksWrapper.appendChild(ticksInput);
+  ticksWrapper.appendChild(ticksUnit);
+
   // Sound controls (upload + play)
   const soundControls = document.createElement('div');
   soundControls.className = 'sound-controls';
@@ -306,6 +325,7 @@ function renderActionCard(action) {
   row.appendChild(labelEl);
   row.appendChild(hotkeyEl);
   row.appendChild(pctWrapper);
+  row.appendChild(ticksWrapper);
   row.appendChild(soundControls);
   row.appendChild(deleteBtn);
 
@@ -398,6 +418,7 @@ function addAction(typeDef) {
     label:      typeDef.label,
     hotkey:     { key: '', ctrl: false, shift: false, alt: false },
     percentage: typeDef.hasPct ? 5 : 0,
+    ticks:      typeDef.hasTicks ? 1 : 0,
     sound:      null,
     soundName:  null
   };
@@ -461,8 +482,12 @@ function collectActions() {
 
     const pctInput = card.querySelector('.pct-input');
     const rawPct = pctInput ? (parseInt(pctInput.value, 10) || 0) : 0;
-    const actionTypeDef = ACTION_TYPES.find(t => t.type === (existing.type || '')) || { hasPct: true };
+    const actionTypeDef = ACTION_TYPES.find(t => t.type === (existing.type || '')) || { hasPct: true, hasTicks: false };
     const percentage = actionTypeDef.hasPct ? rawPct : 0;
+
+    const ticksInput = card.querySelector('.ticks-input');
+    const rawTicks = ticksInput ? (parseInt(ticksInput.value, 10) || 1) : 0;
+    const ticks = actionTypeDef.hasTicks ? Math.max(1, Math.min(10, rawTicks)) : 0;
 
     return {
       id:        id,
@@ -470,6 +495,7 @@ function collectActions() {
       label:     existing.label || '',
       hotkey:    hotkey,
       percentage: percentage,
+      ticks:     ticks,
       sound:     existing.sound || null,
       soundName: existing.soundName || null
     };
@@ -661,22 +687,6 @@ $('btn-save').addEventListener('click', async () => {
   }
 });
 
-$('btn-reset').addEventListener('click', async () => {
-  if (!confirm('모든 설정을 초기값으로 되돌릴까요?')) return;
-  const defaults = {
-    actions: DEFAULT_ACTIONS.map(a => ({ ...a, id: generateId() })),
-    general: { ...DEFAULT_GENERAL }
-  };
-  try {
-    await saveSettings(defaults);
-    currentActions = defaults.actions;
-    renderActionsList();
-    populateGeneral(defaults.general);
-    showFeedback('초기화 완료', 'success');
-  } catch (err) {
-    showFeedback(`초기화 실패: ${err.message}`, 'error');
-  }
-});
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
