@@ -298,6 +298,7 @@ window.OKXActions = (() => {
    */
   async function limitBuy(ctx) {
     requirePage(ctx, 'any');
+    await E.selectLimitOrder();
     const limitPrice = R.readPriceInput();
     if (!isNaN(limitPrice) && limitPrice > 0) ctx.targetPrice = limitPrice;
     const amount = await resolveAmount(ctx, 'buy');
@@ -318,7 +319,6 @@ window.OKXActions = (() => {
       }
     }
 
-    await E.selectLimitOrder();
     if (ctx.pageType !== 'futures' || ctx.tradingMode !== 'hedge') {
       await E.selectDirection('buy', ctx.tradingMode);
     }
@@ -333,6 +333,7 @@ window.OKXActions = (() => {
    */
   async function limitSell(ctx) {
     requirePage(ctx, 'any');
+    await E.selectLimitOrder();
     const limitPrice = R.readPriceInput();
     if (!isNaN(limitPrice) && limitPrice > 0) ctx.targetPrice = limitPrice;
     const amount = await resolveAmount(ctx, 'sell');
@@ -353,7 +354,6 @@ window.OKXActions = (() => {
       }
     }
 
-    await E.selectLimitOrder();
     if (ctx.pageType !== 'futures' || ctx.tradingMode !== 'hedge') {
       await E.selectDirection('sell', ctx.tradingMode);
     }
@@ -483,7 +483,7 @@ window.OKXActions = (() => {
     await E.delay(200);
 
     // Find Close all button (class: position-function-btn, or text match)
-    let closeBtn = document.querySelector('button.position-function-btn:not(.btn-disabled)');
+    let closeBtn = document.querySelector('.position-box button.position-function-btn:not(.btn-disabled)');
 
     if (!closeBtn) {
       // Text-content fallback
@@ -526,11 +526,22 @@ window.OKXActions = (() => {
     await E.delay(300);
 
     const S = window.OKX_SELECTORS;
-    const rows = document.querySelectorAll(S.positionRow);
-    if (!rows.length) throw new Error('반전할 포지션이 없습니다');
+    const allRows = document.querySelectorAll(S.positionRow);
+    if (!allRows.length) throw new Error('반전할 포지션이 없습니다');
+
+    const currentPair = getCurrentPairFromUrl();
+    let row = null;
+    for (const r of allRows) {
+      if (currentPair) {
+        const rowText = r.textContent.toUpperCase().replace(/[-\/\s]/g, '');
+        if (!rowText.includes(currentPair)) continue;
+      }
+      row = r;
+      break;
+    }
+    if (!row) throw new Error('현재 페어의 포지션을 찾을 수 없습니다');
 
     // Find the Reverse button in the position row
-    const row = rows[0];
     const buttons = row.querySelectorAll('button');
     let reverseBtn = null;
     for (const btn of buttons) {
@@ -570,6 +581,8 @@ window.OKXActions = (() => {
 
     // Most recent order is typically the first row
     await E.cancelOrderRow(rows[0]);
+    await E.delay(200);
+    await E.ensureBottomTab('open positions');
     return { message: '마지막 주문 취소', soundKey: 'default' };
   }
 
@@ -589,6 +602,8 @@ window.OKXActions = (() => {
     if (!rows || rows.length === 0) throw new Error('미체결 주문 없음');
 
     await E.cancelAllOrders();
+    await E.delay(200);
+    await E.ensureBottomTab('open positions');
     return { message: `전체 주문 취소 (${rows.length}건)`, soundKey: 'default' };
   }
 
@@ -628,7 +643,8 @@ window.OKXActions = (() => {
     }
 
     chaseBtn.click();
-    await E.delay(100);
+    await E.delay(200);
+    await E.ensureBottomTab('open positions');
 
     return { message: '마지막 주문 체이스 완료', soundKey: 'default' };
   }

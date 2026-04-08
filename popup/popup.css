@@ -163,10 +163,10 @@ body {
   border-color: #3a3e52;
 }
 
-/* Card top row: handle, label, hotkey, pct, ticks, sound-toggle, delete */
+/* Card top row: handle, label, help, hotkey, pct, ticks, sound-toggle, delete */
 .action-card__row {
   display: grid;
-  grid-template-columns: 16px 1fr 100px 56px 52px 28px 28px;
+  grid-template-columns: 16px 1fr 18px 100px 56px 52px 28px 28px;
   align-items: center;
   gap: 8px;
   padding: 9px 10px;
@@ -695,4 +695,39 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 2px;
+}
+
+/* ── Help button & action description ──────────────────────────── */
+
+.btn-help {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #555;
+  background: transparent;
+  color: #999;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.btn-help:hover {
+  color: #fff;
+  border-color: #888;
+}
+
+.action-desc {
+  grid-column: 1 / -1;
+  padding: 4px 8px 6px;
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+  display: none;
+}
+
+.action-desc.show {
+  display: block;
 }

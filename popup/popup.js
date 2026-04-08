@@ -18,22 +18,38 @@
 // ── Action type definitions ───────────────────────────────────────────────────
 
 const ACTION_TYPES = [
-  { type: 'MARKET_BUY',    label: '시장가 매수',      hasPct: true,  soundType: 'entry' },
-  { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true,  soundType: 'entry' },
-  { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true,  soundType: 'entry' },
-  { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true,  soundType: 'entry' },
-  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true,  hasTicks: true, soundType: 'entry' },
-  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true,  hasTicks: true, soundType: 'entry' },
-  { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false, soundType: 'close' },
-  { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false, soundType: 'close' },
-  { type: 'FLIP',          label: '포지션 반전',      hasPct: false, soundType: 'simple' },
-  { type: 'CANCEL_LAST',   label: '마지막 주문 취소', hasPct: false, soundType: 'simple' },
-  { type: 'CANCEL_ALL',         label: '전체 주문 취소',   hasPct: false, soundType: 'simple' },
-  { type: 'CHASE_ORDER',        label: '주문 체이스',      hasPct: false, soundType: 'simple' },
-  { type: 'CLOSE_LONG_MARKET',  label: '롱 시장가 청산',   hasPct: true,  soundType: 'close' },
-  { type: 'CLOSE_LONG_LIMIT',   label: '롱 지정가 청산',   hasPct: true,  soundType: 'close' },
-  { type: 'CLOSE_SHORT_MARKET', label: '숏 시장가 청산',   hasPct: true,  soundType: 'close' },
-  { type: 'CLOSE_SHORT_LIMIT',  label: '숏 지정가 청산',   hasPct: true,  soundType: 'close' },
+  { type: 'MARKET_BUY',    label: '시장가 매수',      hasPct: true,  soundType: 'entry',
+    desc: '현재가로 즉시 매수. 반대 포지션 보유 시 해당 비율 청산, 아니면 신규 진입.' },
+  { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true,  soundType: 'entry',
+    desc: '현재가로 즉시 매도. 반대 포지션 보유 시 해당 비율 청산, 아니면 신규 진입.' },
+  { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true,  soundType: 'entry',
+    desc: '주문폼 가격란에 입력된 가격으로 매수 주문. 호가창 클릭 또는 직접 입력한 가격 사용.' },
+  { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true,  soundType: 'entry',
+    desc: '주문폼 가격란에 입력된 가격으로 매도 주문. 호가창 클릭 또는 직접 입력한 가격 사용.' },
+  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true,  hasTicks: true, soundType: 'entry',
+    desc: '현재가에서 N틱 아래에 지정가 매수 (메이커). 오더북 매수벽 큐 확보용.' },
+  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true,  hasTicks: true, soundType: 'entry',
+    desc: '현재가에서 N틱 위에 지정가 매도 (메이커). 오더북 매도벽 큐 확보용.' },
+  { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false, soundType: 'close',
+    desc: '현재 페어 포지션 전량 시장가 청산. 단방향(one-way) 모드 전용.' },
+  { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false, soundType: 'close',
+    desc: '모든 포지션 시장가 즉시 청산. 긴급 탈출용.' },
+  { type: 'FLIP',          label: '포지션 반전',      hasPct: false, soundType: 'simple',
+    desc: 'OKX Reverse 버튼으로 롱↔숏 즉시 전환. 단방향 모드 전용.' },
+  { type: 'CANCEL_LAST',   label: '마지막 주문 취소', hasPct: false, soundType: 'simple',
+    desc: '가장 최근 미체결 주문 1건 취소.' },
+  { type: 'CANCEL_ALL',         label: '전체 주문 취소',   hasPct: false, soundType: 'simple',
+    desc: '모든 미체결 주문 일괄 취소.' },
+  { type: 'CHASE_ORDER',        label: '주문 체이스',      hasPct: false, soundType: 'simple',
+    desc: '최근 미체결 주문을 현재 최우선 호가로 이동 (OKX Chase 기능).' },
+  { type: 'CLOSE_LONG_MARKET',  label: '롱 시장가 청산',   hasPct: true,  soundType: 'close',
+    desc: '롱 포지션의 N%를 시장가 청산. 헤지 모드 전용.' },
+  { type: 'CLOSE_LONG_LIMIT',   label: '롱 지정가 청산',   hasPct: true,  soundType: 'close',
+    desc: '롱 포지션의 N%를 지정가 청산. 헤지 모드 전용.' },
+  { type: 'CLOSE_SHORT_MARKET', label: '숏 시장가 청산',   hasPct: true,  soundType: 'close',
+    desc: '숏 포지션의 N%를 시장가 청산. 헤지 모드 전용.' },
+  { type: 'CLOSE_SHORT_LIMIT',  label: '숏 지정가 청산',   hasPct: true,  soundType: 'close',
+    desc: '숏 포지션의 N%를 지정가 청산. 헤지 모드 전용.' },
 ];
 
 const SOUND_SLOTS = {
@@ -222,6 +238,20 @@ function renderActionCard(action) {
   labelEl.className = 'action-card__label';
   labelEl.textContent = action.label;
 
+  // Help button + description
+  const helpBtn = document.createElement('button');
+  helpBtn.className = 'btn-help';
+  helpBtn.title = '설명 보기';
+  helpBtn.textContent = '?';
+
+  const descEl = document.createElement('div');
+  descEl.className = 'action-desc';
+  descEl.textContent = typeDef.desc || '';
+
+  helpBtn.addEventListener('click', () => {
+    descEl.classList.toggle('show');
+  });
+
   // Hotkey input
   const hotkeyEl = document.createElement('div');
   hotkeyEl.className = 'hotkey-input';
@@ -304,6 +334,7 @@ function renderActionCard(action) {
 
   row.appendChild(handleEl);
   row.appendChild(labelEl);
+  row.appendChild(helpBtn);
   row.appendChild(hotkeyEl);
   row.appendChild(pctWrapper);
   row.appendChild(ticksWrapper);
@@ -311,6 +342,7 @@ function renderActionCard(action) {
   row.appendChild(deleteBtn);
 
   card.appendChild(row);
+  card.appendChild(descEl);
 
   // Collapsible sound section
   const soundsSection = document.createElement('div');
@@ -357,6 +389,7 @@ function renderActionCard(action) {
       if (!file) return;
       if (file.size > 1024 * 1024) {
         showFeedback('파일이 1MB를 초과합니다', 'error');
+        return;
       }
       const reader = new FileReader();
       reader.onload = (ev) => {
