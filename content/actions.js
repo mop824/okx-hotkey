@@ -58,7 +58,7 @@ window.OKXActions = (() => {
     const unit = getAmountUnit();
     if (unit === 'USDT') return usdtAmount;
     const price = R.readLastPrice();
-    if (isNaN(price) || price <= 0) return usdtAmount;
+    if (isNaN(price) || price <= 0) throw new Error('현재가를 읽을 수 없어 단위 변환 실패');
     return usdtAmount / price;
   }
 
@@ -481,14 +481,11 @@ window.OKXActions = (() => {
     if (!closeBtn) throw new Error('Close all button not found or disabled (no positions?)');
 
     closeBtn.click();
-    await E.delay(300);
-
-    // Handle confirmation dialog
-    const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
-      const text = btn.textContent.trim().toLowerCase();
-      return text === 'confirm' || text === '확인' || text === 'ok';
-    });
-    if (confirmBtn) confirmBtn.click();
+    const confirmBtn = await E.waitForConfirmButton();
+    if (confirmBtn) {
+      confirmBtn.click();
+      await E.delay(100);
+    }
 
     return '전체 포지션 청산';
   }
@@ -523,14 +520,11 @@ window.OKXActions = (() => {
     if (!reverseBtn) throw new Error('Reverse button not found in position row');
 
     reverseBtn.click();
-    await E.delay(500);
-
-    // Handle confirmation dialog
-    const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
-      const text = btn.textContent.trim().toLowerCase();
-      return text === 'confirm' || text === '확인' || text === 'ok';
-    });
-    if (confirmBtn) confirmBtn.click();
+    const confirmBtn = await E.waitForConfirmButton();
+    if (confirmBtn) {
+      confirmBtn.click();
+      await E.delay(100);
+    }
 
     return '포지션 반전 완료';
   }

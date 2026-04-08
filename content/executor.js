@@ -272,6 +272,29 @@ window.OKXExecutor = (() => {
   // ── Order management ──────────────────────────────────────────────────────
 
   /**
+   * Poll for a confirm/ok button in the topmost modal overlay.
+   * Retries up to maxAttempts times with interval ms between each.
+   * Returns the button element, or throws if not found.
+   */
+  async function waitForConfirmButton(maxAttempts = 10, interval = 80) {
+    for (let i = 0; i < maxAttempts; i++) {
+      // Scope search to modal/dialog containers first
+      const modals = document.querySelectorAll('.okui-dialog, .okui-modal, [class*="modal"], [class*="dialog"], [role="dialog"]');
+      let searchRoot = document;
+      if (modals.length > 0) {
+        searchRoot = modals[modals.length - 1]; // topmost modal
+      }
+      const btn = Array.from(searchRoot.querySelectorAll('button')).find(b => {
+        const text = b.textContent.trim().toLowerCase();
+        return text === 'confirm' || text === '확인' || text === 'ok';
+      });
+      if (btn) return btn;
+      await delay(interval);
+    }
+    return null; // no confirm dialog appeared (some actions may not have one)
+  }
+
+  /**
    * Cancel a specific order row by clicking its cancel button.
    * Verified: per-row cancel button has class .btn-fill-grey.
    * Falls back to text-content search within the row.
@@ -301,14 +324,11 @@ window.OKXExecutor = (() => {
     }
     if (!cancelBtn) throw new Error('[OKX Hotkey] cancelOrderRow: cancel button not found');
     cancelBtn.click();
-    await delay(300);
-    // Handle confirmation modal
-    const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
-      const text = btn.textContent.trim().toLowerCase();
-      return text === 'confirm' || text === '확인' || text === 'ok';
-    });
-    if (confirmBtn) confirmBtn.click();
-    await delay(100);
+    const confirmBtn = await waitForConfirmButton();
+    if (confirmBtn) {
+      confirmBtn.click();
+      await delay(100);
+    }
   }
 
   /**
@@ -325,26 +345,22 @@ window.OKXExecutor = (() => {
         const text = b.textContent.trim().toLowerCase();
         if (text.includes('cancel all') || text.includes('전체 취소')) {
           b.click();
-          await delay(300);
-          const confirmBtn3 = Array.from(document.querySelectorAll('button')).find(btn => {
-            const text = btn.textContent.trim().toLowerCase();
-            return text === 'confirm' || text === '확인' || text === 'ok';
-          });
-          if (confirmBtn3) confirmBtn3.click();
-          await delay(100);
+          const confirmBtn = await waitForConfirmButton();
+          if (confirmBtn) {
+            confirmBtn.click();
+            await delay(100);
+          }
           return;
         }
       }
       throw new Error('[OKX Hotkey] cancelAllOrders: Cancel All button not found');
     }
     btn.click();
-    await delay(300);
-    const confirmBtn2 = Array.from(document.querySelectorAll('button')).find(btn => {
-      const text = btn.textContent.trim().toLowerCase();
-      return text === 'confirm' || text === '확인' || text === 'ok';
-    });
-    if (confirmBtn2) confirmBtn2.click();
-    await delay(100);
+    const confirmBtn = await waitForConfirmButton();
+    if (confirmBtn) {
+      confirmBtn.click();
+      await delay(100);
+    }
   }
 
   /**
@@ -387,5 +403,6 @@ window.OKXExecutor = (() => {
     cancelOrderRow,
     cancelAllOrders,
     ensureBottomTab,
+    waitForConfirmButton,
   };
 })();

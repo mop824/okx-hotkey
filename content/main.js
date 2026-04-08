@@ -142,10 +142,14 @@
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
-      // Decode the base64 data URL into an audio buffer and play it
-      fetch(action.sound)
-        .then(response => response.arrayBuffer())
-        .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      // Decode base64 data URL directly (avoids CSP blocking fetch on data: URLs)
+      const base64 = action.sound.split(',')[1];
+      const binaryStr = atob(base64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      audioCtx.decodeAudioData(bytes.buffer)
         .then(audioBuffer => {
           const source = audioCtx.createBufferSource();
           source.buffer = audioBuffer;
@@ -167,7 +171,7 @@
 
     const target = e.target;
     const isTextInput = (
-      (target.tagName === 'INPUT' && !target.closest('[class*="tradePanel"]')) ||
+      (target.tagName === 'INPUT' && !target.closest('.place-order-container-common')) ||
       target.tagName === 'TEXTAREA' ||
       target.isContentEditable
     );
