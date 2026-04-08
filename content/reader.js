@@ -187,6 +187,24 @@ window.OKXReader = (() => {
     return parseFloat(input.value.replace(/,/g, ''));
   }
 
+  /**
+   * Read the current leverage setting from the order form.
+   * The leverage button shows text like "10x" or "20x".
+   * @returns {number} Leverage multiplier (defaults to 1 if not found)
+   */
+  function readLeverage() {
+    const S = window.OKX_SELECTORS;
+    const form = document.querySelector(S.orderForm);
+    if (!form) return 1;
+    const buttons = form.querySelectorAll('button');
+    for (const btn of buttons) {
+      const text = btn.textContent.trim();
+      const match = text.match(/^(\d+)[xX]$/);
+      if (match) return parseInt(match[1], 10);
+    }
+    return 1;
+  }
+
   return {
     findPriceInput,
     findAmountInput,
@@ -200,5 +218,6 @@ window.OKXReader = (() => {
     readOrderRows,
     readPriceInput,
     readAmountInput,
+    readLeverage,
   };
 })();

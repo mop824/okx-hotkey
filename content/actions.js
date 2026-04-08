@@ -77,7 +77,8 @@ window.OKXActions = (() => {
       await E.selectDirection(isBuy ? 'open_long' : 'open_short', ctx.tradingMode);
       const balance = R.readAvailableBalance();
       if (isNaN(balance) || balance <= 0) throw new Error('가용 잔고를 읽을 수 없습니다');
-      let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      const leverage = R.readLeverage();
+      let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0) * leverage;
       return convertToInputUnit(amount);
     }
 
@@ -85,6 +86,7 @@ window.OKXActions = (() => {
       const pos = await getPosition();
       const counterDir = isBuy ? 'short' : 'long';
       if (pos.direction === counterDir && pos.size > 0) {
+        // Closing counter-position — use position size directly, no leverage
         return calcAmount(pos.size, ctx.percentage);
       }
     }
@@ -92,7 +94,8 @@ window.OKXActions = (() => {
     // Spot, or futures one-way with no counter-position
     const balance = R.readAvailableBalance();
     if (isNaN(balance) || balance <= 0) throw new Error('가용 잔고를 읽을 수 없습니다');
-    let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    const leverage = ctx.pageType === 'futures' ? R.readLeverage() : 1;
+    let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0) * leverage;
     return convertToInputUnit(amount);
   }
 
