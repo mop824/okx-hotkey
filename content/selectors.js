@@ -75,7 +75,7 @@ window.OKX_SELECTORS = {
   chaseButton: '[data-testid="chase-order"], button[class*="chase"], [aria-label*="Chase"]',
 
   // ── POSITION (futures) ──────────────────────────────────────────────────────
-  // Position panel needs verification when position is open.
-  // Bottom tab "Open positions" shows count. Table structure likely same as orders.
-  positionRow: '.order-table-box .okui-table-row:not([aria-hidden="true"])',
+  // Verified from live scrape: position table is in .position-box (NOT .order-table-box).
+  // .order-table-box is for open orders only. No aria-hidden filter needed here.
+  positionRow: '.position-box .okui-table-row',
 };

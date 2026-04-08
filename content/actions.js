@@ -50,17 +50,78 @@ window.OKXActions = (() => {
     }
   }
 
+  /**
+   * Read position data with automatic tab switching.
+   * Quick path: checks "Open positions (N)" tab text — if N=0, returns immediately (no tab switch).
+   * Slow path: switches to positions tab, parses first row, returns size + direction.
+   * @returns {Promise<{size: number, direction: 'long'|'short'|null}>}
+   */
+  async function getPosition() {
+    // Quick check: position count from tab text (no tab switching needed)
+    const tabs = document.querySelectorAll('[role="tab"]');
+    let posCount = 0;
+    for (const tab of tabs) {
+      if (tab.textContent.trim().toLowerCase().includes('open positions')) {
+        const match = tab.textContent.match(/\((\d+)\)/);
+        posCount = match ? parseInt(match[1]) : 0;
+        break;
+      }
+    }
+    if (posCount === 0) return { size: 0, direction: null };
+
+    // Position exists — switch to positions tab and read
+    await E.ensureBottomTab('open positions');
+    await E.delay(200);
+
+    // Position table lives in .position-box (NOT .order-table-box which is for orders)
+    const S = window.OKX_SELECTORS;
+    const rows = document.querySelectorAll(S.positionRow);
+    if (!rows.length) return { size: 0, direction: null };
+
+    const row = rows[0];
+    const cells = [...row.querySelectorAll('td')];
+
+    // Size is in cell index 1. Format: "-0.0100 BTC" (negative=short) or "0.0100 BTC" (positive=long)
+    // Direction is determined by the sign of the size value
+    if (cells.length > 1) {
+      const sizeText = cells[1].textContent.trim();
+      const match = sizeText.match(/([-+]?[\d,]+\.?\d*)\s*(BTC|ETH|Cont)/i);
+      if (match) {
+        const rawSize = parseFloat(match[1].replace(/,/g, ''));
+        return {
+          size: Math.abs(rawSize),
+          direction: rawSize < 0 ? 'short' : 'long'
+        };
+      }
+    }
+
+    return { size: 0, direction: null };
+  }
+
   // ── Action: MARKET_BUY ────────────────────────────────────────────────────
   /**
    * Market buy X% of available balance.
    */
   async function marketBuy(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
 
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
-    if (amount <= 0) throw new Error(`Calculated amount is 0 (balance: ${balance}, pct: ${ctx.percentage}%)`);
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'short' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
+    if (amount <= 0) throw new Error(`Calculated amount is 0`);
 
     await E.selectMarketOrder();
 
@@ -72,7 +133,6 @@ window.OKXActions = (() => {
 
     await E.fillAmount(amount);
     await E.submitBuy();
-
     return `시장가 매수 ${ctx.percentage}% (${amount})`;
   }
 
@@ -82,11 +142,24 @@ window.OKXActions = (() => {
    */
   async function marketSell(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
 
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
-    if (amount <= 0) throw new Error(`Calculated amount is 0 (balance: ${balance}, pct: ${ctx.percentage}%)`);
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'long' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
+    if (amount <= 0) throw new Error(`Calculated amount is 0`);
 
     await E.selectMarketOrder();
 
@@ -98,7 +171,6 @@ window.OKXActions = (() => {
 
     await E.fillAmount(amount);
     await E.submitSell();
-
     return `시장가 매도 ${ctx.percentage}% (${amount})`;
   }
 
@@ -108,10 +180,23 @@ window.OKXActions = (() => {
    */
   async function limitBuy(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
 
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'short' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
     if (amount <= 0) throw new Error('Calculated amount is 0');
 
     await E.selectLimitOrder();
@@ -124,7 +209,6 @@ window.OKXActions = (() => {
 
     await E.fillAmount(amount);
     await E.submitBuy();
-
     return `지정가 매수 ${ctx.percentage}% (${amount})`;
   }
 
@@ -134,10 +218,23 @@ window.OKXActions = (() => {
    */
   async function limitSell(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
 
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'long' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
     if (amount <= 0) throw new Error('Calculated amount is 0');
 
     await E.selectLimitOrder();
@@ -150,7 +247,6 @@ window.OKXActions = (() => {
 
     await E.fillAmount(amount);
     await E.submitSell();
-
     return `지정가 매도 ${ctx.percentage}% (${amount})`;
   }
 
@@ -160,18 +256,30 @@ window.OKXActions = (() => {
    */
   async function tickBuy(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'short' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
+    if (amount <= 0) throw new Error('Calculated amount is 0');
 
     const bestBid = R.readBestBid();
     if (isNaN(bestBid)) throw new Error('Best bid price not readable');
-
     const tickSize = R.readTickSize();
-    const tick = isNaN(tickSize) ? 0.01 : tickSize; // fallback 0.01
+    const tick = isNaN(tickSize) ? 0.01 : tickSize;
     const price = parseFloat((bestBid + tick).toFixed(String(tick).split('.')[1]?.length || 2));
-
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
-    if (amount <= 0) throw new Error('Calculated amount is 0');
 
     await E.selectLimitOrder();
 
@@ -184,7 +292,6 @@ window.OKXActions = (() => {
     await E.fillPrice(price);
     await E.fillAmount(amount);
     await E.submitBuy();
-
     return `틱 매수 ${ctx.percentage}% @ ${price}`;
   }
 
@@ -194,15 +301,27 @@ window.OKXActions = (() => {
    */
   async function tickSell(ctx) {
     requirePage(ctx, 'any');
-    const balance = R.readAvailableBalance();
-    if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
 
-    const amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    let amount;
+    if (ctx.pageType === 'futures' && ctx.tradingMode === 'one-way') {
+      const pos = await getPosition();
+      if (pos.direction === 'long' && pos.size > 0) {
+        amount = calcAmount(pos.size, ctx.percentage);
+      } else {
+        const balance = R.readAvailableBalance();
+        if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+        amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+      }
+    } else {
+      const balance = R.readAvailableBalance();
+      if (isNaN(balance) || balance <= 0) throw new Error('Available balance not readable');
+      amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0);
+    }
+
     if (amount <= 0) throw new Error('Calculated amount is 0');
 
     const bestAsk = R.readBestAsk();
     if (isNaN(bestAsk)) throw new Error('Best ask price not readable');
-
     const tickSize = R.readTickSize();
     const tick = isNaN(tickSize) ? 0.01 : tickSize;
     const price = parseFloat((bestAsk - tick).toFixed(String(tick).split('.')[1]?.length || 2));
@@ -218,7 +337,6 @@ window.OKXActions = (() => {
     await E.fillPrice(price);
     await E.fillAmount(amount);
     await E.submitSell();
-
     return `틱 매도 ${ctx.percentage}% @ ${price}`;
   }
 
@@ -228,7 +346,7 @@ window.OKXActions = (() => {
    */
   async function partialClose(ctx) {
     requirePage(ctx, 'futures');
-    const pos = R.readPosition();
+    const pos = await getPosition();
     if (!pos.size || pos.size <= 0) throw new Error('No open position to close');
 
     const amount = calcAmount(pos.size, ctx.percentage);
@@ -262,7 +380,7 @@ window.OKXActions = (() => {
    */
   async function closePair(ctx) {
     requirePage(ctx, 'futures');
-    const pos = R.readPosition();
+    const pos = await getPosition();
     if (!pos.size || pos.size <= 0) throw new Error('No open position to close');
 
     await E.selectMarketOrder();
@@ -293,27 +411,40 @@ window.OKXActions = (() => {
    */
   async function closeAll(ctx) {
     requirePage(ctx, 'futures');
-    // Try to find a "Close All" positions button on OKX
-    const closeAllBtns = Array.from(document.querySelectorAll('button')).filter(btn => {
-      const text = btn.textContent.trim().toLowerCase();
-      return text.includes('close all') || text.includes('일괄 청산') || text.includes('전체 청산') || text.includes('全平');
-    });
 
-    if (closeAllBtns.length > 0) {
-      closeAllBtns[0].click();
-      await E.delay(200);
-      // Handle confirmation dialog if present
-      const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
+    // Switch to positions tab where the Close all button lives
+    await E.ensureBottomTab('open positions');
+    await E.delay(200);
+
+    // Find Close all button (class: position-function-btn, or text match)
+    let closeBtn = document.querySelector('button.position-function-btn:not(.btn-disabled)');
+
+    if (!closeBtn) {
+      // Text-content fallback
+      const buttons = document.querySelectorAll('button');
+      for (const btn of buttons) {
         const text = btn.textContent.trim().toLowerCase();
-        return text.includes('confirm') || text.includes('확인') || text.includes('ok');
-      });
-      if (confirmBtn) confirmBtn.click();
-      return '전체 포지션 청산 완료';
+        if ((text.includes('close all') || text.includes('전체 청산') || text.includes('일괄 청산') || text.includes('全平'))
+            && !btn.classList.contains('btn-disabled')) {
+          closeBtn = btn;
+          break;
+        }
+      }
     }
 
-    // Fallback: close current pair
-    await closePair(ctx);
-    return '현재 페어 청산 (전체 청산 버튼 없음)';
+    if (!closeBtn) throw new Error('Close all button not found or disabled (no positions?)');
+
+    closeBtn.click();
+    await E.delay(300);
+
+    // Handle confirmation dialog
+    const confirmBtn = Array.from(document.querySelectorAll('button')).find(btn => {
+      const text = btn.textContent.trim().toLowerCase();
+      return text === 'confirm' || text === '확인' || text === 'ok';
+    });
+    if (confirmBtn) confirmBtn.click();
+
+    return '전체 포지션 청산';
   }
 
   // ── Action: FLIP ─────────────────────────────────────────────────────────
@@ -322,7 +453,7 @@ window.OKXActions = (() => {
    */
   async function flip(ctx) {
     requirePage(ctx, 'futures');
-    const pos = R.readPosition();
+    const pos = await getPosition();
     if (!pos.size || pos.size <= 0) throw new Error('No open position to flip');
 
     const originalSize = pos.size;

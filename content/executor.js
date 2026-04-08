@@ -73,6 +73,10 @@ window.OKXExecutor = (() => {
     const tabs = document.querySelectorAll(tabClass);
     for (const tab of tabs) {
       if (tab.textContent.trim().toLowerCase() === text.toLowerCase()) {
+        // Skip clicking if already active
+        if (tab.getAttribute('aria-selected') === 'true') {
+          return true;
+        }
         tab.click();
         await delay(80);
         return true;
