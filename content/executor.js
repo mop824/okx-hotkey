@@ -278,11 +278,22 @@ window.OKXExecutor = (() => {
    * @param {Element} orderRowEl
    */
   async function cancelOrderRow(orderRowEl) {
-    let cancelBtn = orderRowEl.querySelector(S.cancelButton);
+    let cancelBtn = null;
+    // Primary: find button by text content (most reliable)
+    const buttons = orderRowEl.querySelectorAll('button');
+    for (const btn of buttons) {
+      const text = btn.textContent.trim().toLowerCase();
+      if (text === 'cancel' || text === '취소') {
+        cancelBtn = btn;
+        break;
+      }
+    }
+    // Fallback: btn-fill-grey that is NOT chase
     if (!cancelBtn) {
-      const buttons = orderRowEl.querySelectorAll('button');
-      for (const btn of buttons) {
-        if (/cancel|취소/i.test(btn.textContent.trim())) {
+      const greyBtns = orderRowEl.querySelectorAll(S.cancelButton);
+      for (const btn of greyBtns) {
+        const text = btn.textContent.trim().toLowerCase();
+        if (!text.includes('chase') && !text.includes('추적') && !text.includes('追踪')) {
           cancelBtn = btn;
           break;
         }
