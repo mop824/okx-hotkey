@@ -299,7 +299,7 @@ window.OKXExecutor = (() => {
    * Retries up to maxAttempts times with interval ms between each.
    * Returns the button element, or throws if not found.
    */
-  async function waitForConfirmButton(maxAttempts = 15, interval = 100) {
+  async function waitForConfirmButton(maxAttempts = 10, interval = 80) {
     for (let i = 0; i < maxAttempts; i++) {
       // Scope search to modal/dialog containers first
       const modals = document.querySelectorAll('.okui-dialog, .okui-modal, [class*="modal"], [class*="dialog"], [role="dialog"]');
