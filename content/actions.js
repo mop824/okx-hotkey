@@ -373,6 +373,7 @@ window.OKXActions = (() => {
    */
   async function cancelLast(ctx) {
     requirePage(ctx, 'any');
+    await E.ensureBottomTab('open orders');
     const rows = R.readOrderRows();
     if (rows.length === 0) throw new Error('미체결 주문 없음');
 
@@ -387,6 +388,7 @@ window.OKXActions = (() => {
    */
   async function cancelAll(ctx) {
     requirePage(ctx, 'any');
+    await E.ensureBottomTab('open orders');
     const rows = R.readOrderRows();
     if (rows.length === 0) throw new Error('미체결 주문 없음');
 
@@ -401,23 +403,23 @@ window.OKXActions = (() => {
    */
   async function chaseOrder(ctx) {
     requirePage(ctx, 'any');
+    await E.ensureBottomTab('open orders');
     const rows = R.readOrderRows();
     if (rows.length === 0) throw new Error('미체결 주문 없음');
 
     const row = rows[0]; // Most recent order is first row
 
-    // Try the dedicated chase button selector first.
-    // Chase button needs logged-in session to fully verify; using structural selector.
-    const S = window.OKX_SELECTORS;
-    let chaseBtn = row.querySelector(S.chaseButton.split(',')[0].trim());
+    // Find chase button by text content (most reliable — button has no special class/testid)
+    const rowBtns = Array.from(row.querySelectorAll('button'));
+    let chaseBtn = rowBtns.find(btn => {
+      const t = btn.textContent.trim().toLowerCase();
+      return t === 'chase' || t.includes('체이스') || t.includes('追单');
+    });
 
     if (!chaseBtn) {
-      // Fallback: find button with "chase" text in the row
-      const rowBtns = Array.from(row.querySelectorAll('button'));
-      chaseBtn = rowBtns.find(btn => {
-        const t = btn.textContent.trim().toLowerCase();
-        return t.includes('chase') || t.includes('체이스') || t.includes('追单');
-      });
+      // Fallback: try selector-based
+      const S = window.OKX_SELECTORS;
+      chaseBtn = row.querySelector(S.chaseButton);
     }
 
     if (!chaseBtn) {

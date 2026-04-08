@@ -313,6 +313,27 @@ window.OKXExecutor = (() => {
     await delay(100);
   }
 
+  /**
+   * Click a bottom panel tab by text content (e.g. "Open orders", "Open positions").
+   * Bottom tabs are .okui-tabs-pane-underline[role="tab"] in the lower panel area.
+   * Uses partial text matching (case-insensitive).
+   * @param {string} tabText — partial text to match (e.g. "open orders")
+   * @returns {Promise<boolean>}
+   */
+  async function ensureBottomTab(tabText) {
+    const tabs = document.querySelectorAll('.okui-tabs-pane-underline[role="tab"]');
+    const target = tabText.toLowerCase();
+    for (const tab of tabs) {
+      if (tab.textContent.trim().toLowerCase().includes(target)) {
+        tab.click();
+        await delay(200);
+        return true;
+      }
+    }
+    console.warn('[OKX Hotkey] ensureBottomTab: tab not found for', tabText);
+    return false;
+  }
+
   return {
     setInputValue,
     delay,
@@ -331,5 +352,6 @@ window.OKXExecutor = (() => {
     submitSell,
     cancelOrderRow,
     cancelAllOrders,
+    ensureBottomTab,
   };
 })();

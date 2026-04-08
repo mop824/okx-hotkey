@@ -133,14 +133,28 @@
 
   // ── Sound playback ────────────────────────────────────────────────────────
 
+  let audioCtx = null;
+
   function playActionSound(action) {
     if (!settings.general.soundEnabled) return;
     if (!action.sound) return;
     try {
-      const audio = new Audio(action.sound);
-      audio.play().catch(err => {
-        console.warn('[OKX Hotkey] Sound playback failed:', err);
-      });
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      // Decode the base64 data URL into an audio buffer and play it
+      fetch(action.sound)
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+          const source = audioCtx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(audioCtx.destination);
+          source.start(0);
+        })
+        .catch(err => {
+          console.warn('[OKX Hotkey] Sound playback failed:', err);
+        });
     } catch (err) {
       console.warn('[OKX Hotkey] Sound init failed:', err);
     }
@@ -164,6 +178,11 @@
 
       e.preventDefault();
       e.stopImmediatePropagation();
+
+      // Resume AudioContext during user gesture to comply with autoplay policy
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
 
       await executeAction(action);
       break;
