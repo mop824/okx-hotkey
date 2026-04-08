@@ -54,13 +54,13 @@ window.OKXActions = (() => {
    * @param {number} usdtAmount - Amount in USDT
    * @returns {number} Amount in the input's unit
    */
-  function convertToInputUnit(usdtAmount) {
+  function convertToInputUnit(usdtAmount, targetPrice) {
     const unit = getAmountUnit();
     if (unit === 'USDT') return usdtAmount;
-    const price = R.readLastPrice();
+    const price = (targetPrice > 0) ? targetPrice : R.readLastPrice();
     if (isNaN(price) || price <= 0) throw new Error('현재가를 읽을 수 없어 단위 변환 실패');
     const result = usdtAmount / price;
-    console.log('[OKX Hotkey] convertToInputUnit:', { usdtAmount, unit, price, result });
+    console.log('[OKX Hotkey] convertToInputUnit:', { usdtAmount, unit, price, source: targetPrice > 0 ? 'limit' : 'last', result });
     return result;
   }
 
@@ -82,7 +82,7 @@ window.OKXActions = (() => {
       const leverage = R.readLeverage();
       console.log('[OKX Hotkey] resolveAmount:', { side, mode: ctx.tradingMode, balance, leverage, seedCap: ctx.seedCap, pct: ctx.percentage });
       let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0) * leverage;
-      return convertToInputUnit(amount);
+      return convertToInputUnit(amount, ctx.targetPrice);
     }
 
     if (ctx.pageType === 'futures' && ctx.tradingMode !== 'hedge') {
@@ -101,7 +101,7 @@ window.OKXActions = (() => {
     const leverage = ctx.pageType === 'futures' ? R.readLeverage() : 1;
     console.log('[OKX Hotkey] resolveAmount:', { side, mode: ctx.tradingMode, balance, leverage, seedCap: ctx.seedCap, pct: ctx.percentage });
     let amount = calcAmount(balance, ctx.percentage, 6, ctx.seedCap || 0) * leverage;
-    return convertToInputUnit(amount);
+    return convertToInputUnit(amount, ctx.targetPrice);
   }
 
   /**
@@ -279,6 +279,8 @@ window.OKXActions = (() => {
    */
   async function limitBuy(ctx) {
     requirePage(ctx, 'any');
+    const limitPrice = R.readPriceInput();
+    if (!isNaN(limitPrice) && limitPrice > 0) ctx.targetPrice = limitPrice;
     const amount = await resolveAmount(ctx, 'buy');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
@@ -312,6 +314,8 @@ window.OKXActions = (() => {
    */
   async function limitSell(ctx) {
     requirePage(ctx, 'any');
+    const limitPrice = R.readPriceInput();
+    if (!isNaN(limitPrice) && limitPrice > 0) ctx.targetPrice = limitPrice;
     const amount = await resolveAmount(ctx, 'sell');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
@@ -345,6 +349,13 @@ window.OKXActions = (() => {
    */
   async function tickBuy(ctx) {
     requirePage(ctx, 'any');
+    const bestBid = R.readBestBid();
+    if (isNaN(bestBid)) throw new Error('최우선 매수호가를 읽을 수 없습니다');
+    const tickSize = R.readTickSize();
+    const tick = isNaN(tickSize) ? 0.01 : tickSize;
+    const ticks = ctx.ticks || 1;
+    const price = parseFloat((bestBid + tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
+    ctx.targetPrice = price;
     const amount = await resolveAmount(ctx, 'buy');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
@@ -363,13 +374,6 @@ window.OKXActions = (() => {
       }
     }
 
-    const bestBid = R.readBestBid();
-    if (isNaN(bestBid)) throw new Error('최우선 매수호가를 읽을 수 없습니다');
-    const tickSize = R.readTickSize();
-    const tick = isNaN(tickSize) ? 0.01 : tickSize;
-    const ticks = ctx.ticks || 1;
-    const price = parseFloat((bestBid + tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
-
     await E.selectLimitOrder();
     if (ctx.pageType !== 'futures' || ctx.tradingMode !== 'hedge') {
       await E.selectDirection('buy', ctx.tradingMode);
@@ -386,6 +390,13 @@ window.OKXActions = (() => {
    */
   async function tickSell(ctx) {
     requirePage(ctx, 'any');
+    const bestAsk = R.readBestAsk();
+    if (isNaN(bestAsk)) throw new Error('최우선 매도호가를 읽을 수 없습니다');
+    const tickSize = R.readTickSize();
+    const tick = isNaN(tickSize) ? 0.01 : tickSize;
+    const ticks = ctx.ticks || 1;
+    const price = parseFloat((bestAsk - tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
+    ctx.targetPrice = price;
     const amount = await resolveAmount(ctx, 'sell');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
@@ -403,13 +414,6 @@ window.OKXActions = (() => {
         if (pos.size > 0) soundKey = 'add';
       }
     }
-
-    const bestAsk = R.readBestAsk();
-    if (isNaN(bestAsk)) throw new Error('최우선 매도호가를 읽을 수 없습니다');
-    const tickSize = R.readTickSize();
-    const tick = isNaN(tickSize) ? 0.01 : tickSize;
-    const ticks = ctx.ticks || 1;
-    const price = parseFloat((bestAsk - tick * ticks).toFixed(String(tick).split('.')[1]?.length || 2));
 
     await E.selectLimitOrder();
     if (ctx.pageType !== 'futures' || ctx.tradingMode !== 'hedge') {
