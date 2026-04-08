@@ -163,10 +163,10 @@ body {
   border-color: #3a3e52;
 }
 
-/* Card top row: handle, label, hotkey, pct, ticks, sound, delete */
+/* Card top row: handle, label, hotkey, pct, ticks, sound-toggle, delete */
 .action-card__row {
   display: grid;
-  grid-template-columns: 16px 1fr 100px 56px 44px 58px 28px;
+  grid-template-columns: 16px 1fr 100px 56px 44px 28px 28px;
   align-items: center;
   gap: 8px;
   padding: 9px 10px;
@@ -348,45 +348,90 @@ body {
   background: rgba(231, 76, 60, 0.08);
 }
 
-/* Sound name bar under card row */
-.action-card__sound-name {
-  font-size: 11px;
-  color: var(--text-muted);
-  padding: 0 10px 7px;
-  white-space: nowrap;
+/* Sound toggle button indicator */
+.btn-sound-toggle {
+  position: relative;
+}
+.btn-sound-toggle[data-has-sound="true"]::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 1px solid var(--bg-card);
+}
+.btn-sound-toggle[aria-expanded="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(88, 101, 242, 0.1);
+}
+
+/* Collapsible sound section */
+.card__sounds {
+  max-height: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  transition: max-height 0.2s ease;
 }
-
-/* ── Alternate sound row (dual-sound actions) ─────────────── */
-
-.action-card__alt-sound {
-  display: flex;
-  gap: 12px;
-  padding: 4px 10px 8px;
+.card__sounds.is-open {
+  max-height: 44px;
   border-top: 1px solid var(--border);
-  margin-top: 2px;
 }
 
-.alt-sound-item {
+/* Sound strip — single flex row */
+.sounds-strip {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
+  gap: 0;
+  padding: 4px 10px;
 }
 
-.alt-sound-label {
-  color: var(--text-muted);
+/* Each slot */
+.sound-slot {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.sound-slot + .sound-slot {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
+.slot-label {
+  font-size: 10px;
   font-weight: 600;
-  min-width: 28px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-right: 2px;
 }
 
-.alt-sound-name {
+/* Slot buttons — smaller (22px) */
+.slot-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.slot-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+.slot-btn.has-sound {
+  border-color: var(--success);
+  color: var(--success);
 }
 
 /* ── Toggle ─────────────────────────────────────────────────────── */

@@ -211,11 +211,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'buy');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('long');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a short
+        } else if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing long
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('long');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     await E.selectMarketOrder();
@@ -224,7 +232,7 @@ window.OKXActions = (() => {
     }
     await E.fillAmount(amount);
     await E.submitBuy();
-    return { message: `시장가 매수 ${ctx.percentage}% (${amount})`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `시장가 매수 ${ctx.percentage}% (${amount})`, soundKey };
   }
 
   // ── Action: MARKET_SELL ───────────────────────────────────────────────────
@@ -236,11 +244,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'sell');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('short');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a long
+        } else if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing short
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('short');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     await E.selectMarketOrder();
@@ -249,7 +265,7 @@ window.OKXActions = (() => {
     }
     await E.fillAmount(amount);
     await E.submitSell();
-    return { message: `시장가 매도 ${ctx.percentage}% (${amount})`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `시장가 매도 ${ctx.percentage}% (${amount})`, soundKey };
   }
 
   // ── Action: LIMIT_BUY ────────────────────────────────────────────────────
@@ -261,11 +277,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'buy');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('long');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a short
+        } else if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing long
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('long');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     await E.selectLimitOrder();
@@ -274,7 +298,7 @@ window.OKXActions = (() => {
     }
     await E.fillAmount(amount);
     await E.submitBuy();
-    return { message: `지정가 매수 ${ctx.percentage}% (${amount})`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `지정가 매수 ${ctx.percentage}% (${amount})`, soundKey };
   }
 
   // ── Action: LIMIT_SELL ───────────────────────────────────────────────────
@@ -286,11 +310,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'sell');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('short');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a long
+        } else if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing short
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('short');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     await E.selectLimitOrder();
@@ -299,7 +331,7 @@ window.OKXActions = (() => {
     }
     await E.fillAmount(amount);
     await E.submitSell();
-    return { message: `지정가 매도 ${ctx.percentage}% (${amount})`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `지정가 매도 ${ctx.percentage}% (${amount})`, soundKey };
   }
 
   // ── Action: TICK_BUY ─────────────────────────────────────────────────────
@@ -311,11 +343,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'buy');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('long');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a short
+        } else if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing long
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('long');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     const bestBid = R.readBestBid();
@@ -332,7 +372,7 @@ window.OKXActions = (() => {
     await E.fillPrice(price);
     await E.fillAmount(amount);
     await E.submitBuy();
-    return { message: `틱 매수 ${ctx.percentage}% @ ${price}`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `틱 매수 ${ctx.percentage}% @ ${price}`, soundKey };
   }
 
   // ── Action: TICK_SELL ────────────────────────────────────────────────────
@@ -344,11 +384,19 @@ window.OKXActions = (() => {
     const amount = await resolveAmount(ctx, 'sell');
     if (amount <= 0) throw new Error('계산된 수량이 0입니다');
 
-    // Detect averaging: same-direction position exists
-    let isAdd = false;
+    let soundKey = 'default';
     if (ctx.pageType === 'futures') {
-      const pos = await getPosition('short');
-      if (pos.size > 0) isAdd = true;
+      if (ctx.tradingMode === 'one-way') {
+        const pos = await getPosition();
+        if (pos.direction === 'long' && pos.size > 0) {
+          soundKey = pos.isProfit ? 'profit' : 'loss'; // closing a long
+        } else if (pos.direction === 'short' && pos.size > 0) {
+          soundKey = 'add'; // adding to existing short
+        }
+      } else if (ctx.tradingMode === 'hedge') {
+        const pos = await getPosition('short');
+        if (pos.size > 0) soundKey = 'add';
+      }
     }
 
     const bestAsk = R.readBestAsk();
@@ -365,7 +413,7 @@ window.OKXActions = (() => {
     await E.fillPrice(price);
     await E.fillAmount(amount);
     await E.submitSell();
-    return { message: `틱 매도 ${ctx.percentage}% @ ${price}`, soundKey: isAdd ? 'add' : 'default' };
+    return { message: `틱 매도 ${ctx.percentage}% @ ${price}`, soundKey };
   }
 
   // ── Action: CLOSE_PAIR ───────────────────────────────────────────────────

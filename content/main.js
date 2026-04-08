@@ -138,11 +138,14 @@
   function playActionSound(action, soundKey = 'default') {
     if (!settings.general.soundEnabled) return;
 
-    // Select the appropriate sound based on soundKey
-    let soundData = action.sound;
-    if (soundKey === 'add' && action.soundAdd) soundData = action.soundAdd;
-    if (soundKey === 'loss' && action.soundLoss) soundData = action.soundLoss;
-    if (soundKey === 'profit') soundData = action.sound; // profit uses default sound
+    // Route soundKey to the correct sound data field
+    const soundMap = {
+      'default': action.sound,
+      'add':     action.soundAdd || action.sound,
+      'profit':  action.soundProfit || action.sound,
+      'loss':    action.soundLoss || action.sound,
+    };
+    const soundData = soundMap[soundKey] || action.sound;
 
     if (!soundData) return;
     try {

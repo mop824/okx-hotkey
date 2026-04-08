@@ -18,23 +18,39 @@
 // ── Action type definitions ───────────────────────────────────────────────────
 
 const ACTION_TYPES = [
-  { type: 'MARKET_BUY',    label: '시장가 매수',      hasPct: true,  hasAddSound: true  },
-  { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true,  hasAddSound: true  },
-  { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true,  hasAddSound: true  },
-  { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true,  hasAddSound: true  },
-  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true,  hasTicks: true, hasAddSound: true  },
-  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true,  hasTicks: true, hasAddSound: true  },
-  { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false, hasProfitLossSound: true },
-  { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false, hasProfitLossSound: true },
-  { type: 'FLIP',          label: '포지션 반전',      hasPct: false },
-  { type: 'CANCEL_LAST',   label: '마지막 주문 취소', hasPct: false },
-  { type: 'CANCEL_ALL',         label: '전체 주문 취소',   hasPct: false },
-  { type: 'CHASE_ORDER',        label: '주문 체이스',      hasPct: false },
-  { type: 'CLOSE_LONG_MARKET',  label: '롱 시장가 청산',   hasPct: true,  hasProfitLossSound: true },
-  { type: 'CLOSE_LONG_LIMIT',   label: '롱 지정가 청산',   hasPct: true,  hasProfitLossSound: true },
-  { type: 'CLOSE_SHORT_MARKET', label: '숏 시장가 청산',   hasPct: true,  hasProfitLossSound: true },
-  { type: 'CLOSE_SHORT_LIMIT',  label: '숏 지정가 청산',   hasPct: true,  hasProfitLossSound: true },
+  { type: 'MARKET_BUY',    label: '시장가 매수',      hasPct: true,  soundType: 'entry' },
+  { type: 'MARKET_SELL',   label: '시장가 매도',      hasPct: true,  soundType: 'entry' },
+  { type: 'LIMIT_BUY',     label: '지정가 매수',      hasPct: true,  soundType: 'entry' },
+  { type: 'LIMIT_SELL',    label: '지정가 매도',      hasPct: true,  soundType: 'entry' },
+  { type: 'TICK_BUY',      label: '틱 매수',          hasPct: true,  hasTicks: true, soundType: 'entry' },
+  { type: 'TICK_SELL',     label: '틱 매도',          hasPct: true,  hasTicks: true, soundType: 'entry' },
+  { type: 'CLOSE_PAIR',    label: '페어 청산',        hasPct: false, soundType: 'close' },
+  { type: 'CLOSE_ALL',     label: '전체 청산',        hasPct: false, soundType: 'close' },
+  { type: 'FLIP',          label: '포지션 반전',      hasPct: false, soundType: 'simple' },
+  { type: 'CANCEL_LAST',   label: '마지막 주문 취소', hasPct: false, soundType: 'simple' },
+  { type: 'CANCEL_ALL',         label: '전체 주문 취소',   hasPct: false, soundType: 'simple' },
+  { type: 'CHASE_ORDER',        label: '주문 체이스',      hasPct: false, soundType: 'simple' },
+  { type: 'CLOSE_LONG_MARKET',  label: '롱 시장가 청산',   hasPct: true,  soundType: 'close' },
+  { type: 'CLOSE_LONG_LIMIT',   label: '롱 지정가 청산',   hasPct: true,  soundType: 'close' },
+  { type: 'CLOSE_SHORT_MARKET', label: '숏 시장가 청산',   hasPct: true,  soundType: 'close' },
+  { type: 'CLOSE_SHORT_LIMIT',  label: '숏 지정가 청산',   hasPct: true,  soundType: 'close' },
 ];
+
+const SOUND_SLOTS = {
+  entry: [
+    { key: 'sound',       nameKey: 'soundName',       label: '신규' },
+    { key: 'soundAdd',    nameKey: 'soundAddName',    label: '물타기' },
+    { key: 'soundProfit', nameKey: 'soundProfitName', label: '수익' },
+    { key: 'soundLoss',   nameKey: 'soundLossName',   label: '손실' },
+  ],
+  close: [
+    { key: 'sound',     nameKey: 'soundName',     label: '수익' },
+    { key: 'soundLoss', nameKey: 'soundLossName', label: '손실' },
+  ],
+  simple: [
+    { key: 'sound', nameKey: 'soundName', label: null },
+  ],
+};
 
 const DEFAULT_GENERAL = {
   soundEnabled: true,
@@ -267,73 +283,17 @@ function renderActionCard(action) {
   ticksWrapper.appendChild(ticksInput);
   ticksWrapper.appendChild(ticksUnit);
 
-  // Sound controls (upload + play)
-  const soundControls = document.createElement('div');
-  soundControls.className = 'sound-controls';
+  // Sound toggle button
+  const soundToggle = document.createElement('button');
+  soundToggle.className = 'btn-icon btn-sound-toggle';
+  soundToggle.setAttribute('aria-label', '사운드 설정');
+  soundToggle.setAttribute('aria-expanded', 'false');
+  soundToggle.textContent = '\u266A'; // ♪
 
-  const uploadBtn = document.createElement('button');
-  uploadBtn.className = 'btn-icon' + (action.sound ? ' has-sound' : '');
-  uploadBtn.title = action.soundName || '소리 업로드 (mp3/wav/ogg)';
-  uploadBtn.textContent = '🔊';
-
-  const playBtn = document.createElement('button');
-  playBtn.className = 'btn-icon';
-  playBtn.title = '소리 미리 듣기';
-  playBtn.textContent = '▶';
-  playBtn.style.display = action.sound ? '' : 'none';
-
-  // Hidden file input for sound upload
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = 'audio/mp3,audio/wav,audio/ogg,audio/*';
-  fileInput.style.display = 'none';
-
-  uploadBtn.addEventListener('click', () => fileInput.click());
-
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files && fileInput.files[0];
-    if (!file) return;
-
-    if (file.size > 1024 * 1024) {
-      showFeedback('경고: 파일이 1MB를 초과합니다. 저장되지만 느릴 수 있습니다.', 'error');
-    }
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target.result;
-      // Update in-memory action
-      const idx = currentActions.findIndex(a => a.id === action.id);
-      if (idx !== -1) {
-        currentActions[idx].sound = dataUrl;
-        currentActions[idx].soundName = file.name;
-      }
-      // Update this card's action reference too (for preview)
-      action.sound = dataUrl;
-      action.soundName = file.name;
-
-      uploadBtn.classList.add('has-sound');
-      uploadBtn.title = file.name;
-      playBtn.style.display = '';
-      updateSoundName(card, file.name);
-    };
-    reader.readAsDataURL(file);
-    fileInput.value = '';
-  });
-
-  playBtn.addEventListener('click', () => {
-    if (!action.sound) return;
-    try {
-      new Audio(action.sound).play().catch(err => {
-        showFeedback(`소리 재생 오류: ${err.message}`, 'error');
-      });
-    } catch (err) {
-      showFeedback(`소리 재생 오류: ${err.message}`, 'error');
-    }
-  });
-
-  soundControls.appendChild(uploadBtn);
-  soundControls.appendChild(playBtn);
-  soundControls.appendChild(fileInput);
+  // Check if any sound is set
+  const slots = SOUND_SLOTS[typeDef.soundType || 'simple'];
+  const hasAnySound = slots.some(s => !!action[s.key]);
+  soundToggle.setAttribute('data-has-sound', hasAnySound ? 'true' : 'false');
 
   // Delete button
   const deleteBtn = document.createElement('button');
@@ -347,124 +307,104 @@ function renderActionCard(action) {
   row.appendChild(hotkeyEl);
   row.appendChild(pctWrapper);
   row.appendChild(ticksWrapper);
-  row.appendChild(soundControls);
+  row.appendChild(soundToggle);
   row.appendChild(deleteBtn);
 
   card.appendChild(row);
 
-  // Sound name display (if already has a sound)
-  if (action.soundName) {
-    const nameEl = document.createElement('div');
-    nameEl.className = 'action-card__sound-name';
-    nameEl.textContent = `🔊 ${action.soundName}`;
-    card.appendChild(nameEl);
-  }
+  // Collapsible sound section
+  const soundsSection = document.createElement('div');
+  soundsSection.className = 'card__sounds';
 
-  // Alternate sound row (for dual-sound actions)
-  if (typeDef.hasAddSound || typeDef.hasProfitLossSound) {
-    const altRow = document.createElement('div');
-    altRow.className = 'action-card__alt-sound';
+  const strip = document.createElement('div');
+  strip.className = 'sounds-strip';
 
-    const label1Text = typeDef.hasAddSound ? '신규' : '수익';
-    const label2Text = typeDef.hasAddSound ? '물타기' : '손실';
-    const altSoundKey = typeDef.hasAddSound ? 'soundAdd' : 'soundLoss';
-    const altSoundNameKey = typeDef.hasAddSound ? 'soundAddName' : 'soundLossName';
+  for (const slot of slots) {
+    const slotEl = document.createElement('div');
+    slotEl.className = 'sound-slot';
 
-    // Primary sound label + controls
-    const primary = document.createElement('div');
-    primary.className = 'alt-sound-item';
-    const pLabel = document.createElement('span');
-    pLabel.className = 'alt-sound-label';
-    pLabel.textContent = label1Text;
-    const pName = document.createElement('span');
-    pName.className = 'alt-sound-name';
-    pName.textContent = action.soundName || '없음';
-    primary.appendChild(pLabel);
-    primary.appendChild(pName);
+    // Label (skip for simple single-slot with null label)
+    if (slot.label) {
+      const lbl = document.createElement('span');
+      lbl.className = 'slot-label';
+      lbl.textContent = slot.label;
+      slotEl.appendChild(lbl);
+    }
 
-    // Alternate sound label + controls
-    const alternate = document.createElement('div');
-    alternate.className = 'alt-sound-item';
-    const aLabel = document.createElement('span');
-    aLabel.className = 'alt-sound-label';
-    aLabel.textContent = label2Text;
-    const aUpload = document.createElement('button');
-    aUpload.className = 'btn-icon' + (action[altSoundKey] ? ' has-sound' : '');
-    aUpload.title = action[altSoundNameKey] || `${label2Text} 소리 업로드`;
-    aUpload.textContent = '🔊';
-    const aPlay = document.createElement('button');
-    aPlay.className = 'btn-icon';
-    aPlay.title = `${label2Text} 소리 미리 듣기`;
-    aPlay.textContent = '▶';
-    aPlay.style.display = action[altSoundKey] ? '' : 'none';
-    const aName = document.createElement('span');
-    aName.className = 'alt-sound-name';
-    aName.textContent = action[altSoundNameKey] || '없음';
+    // Upload button
+    const uploadBtn = document.createElement('button');
+    uploadBtn.className = 'slot-btn' + (action[slot.key] ? ' has-sound' : '');
+    uploadBtn.setAttribute('aria-label', (slot.label || '사운드') + ' 업로드');
+    uploadBtn.textContent = '\u266A'; // ♪
 
-    const aFileInput = document.createElement('input');
-    aFileInput.type = 'file';
-    aFileInput.accept = 'audio/mp3,audio/wav,audio/ogg,audio/*';
-    aFileInput.style.display = 'none';
+    // Hidden file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'audio/mp3,audio/wav,audio/ogg,audio/*';
+    fileInput.style.display = 'none';
 
-    aUpload.addEventListener('click', () => aFileInput.click());
-    aFileInput.addEventListener('change', () => {
-      const file = aFileInput.files && aFileInput.files[0];
+    uploadBtn.addEventListener('click', () => fileInput.click());
+
+    // Play button (only visible if sound exists)
+    const playBtn = document.createElement('button');
+    playBtn.className = 'slot-btn';
+    playBtn.setAttribute('aria-label', (slot.label || '사운드') + ' 재생');
+    playBtn.textContent = '\u25B6'; // ▶
+    playBtn.style.display = action[slot.key] ? '' : 'none';
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
       if (!file) return;
+      if (file.size > 1024 * 1024) {
+        showFeedback('파일이 1MB를 초과합니다', 'error');
+      }
       const reader = new FileReader();
       reader.onload = (ev) => {
         const dataUrl = ev.target.result;
         const idx = currentActions.findIndex(a => a.id === action.id);
         if (idx !== -1) {
-          currentActions[idx][altSoundKey] = dataUrl;
-          currentActions[idx][altSoundNameKey] = file.name;
+          currentActions[idx][slot.key] = dataUrl;
+          currentActions[idx][slot.nameKey] = file.name;
         }
-        action[altSoundKey] = dataUrl;
-        action[altSoundNameKey] = file.name;
-        aUpload.classList.add('has-sound');
-        aUpload.title = file.name;
-        aPlay.style.display = '';
-        aName.textContent = file.name;
+        action[slot.key] = dataUrl;
+        action[slot.nameKey] = file.name;
+        uploadBtn.classList.add('has-sound');
+        playBtn.style.display = '';
+        // Update toggle indicator
+        soundToggle.setAttribute('data-has-sound', 'true');
       };
       reader.readAsDataURL(file);
-      aFileInput.value = '';
+      fileInput.value = '';
     });
 
-    aPlay.addEventListener('click', () => {
-      if (!action[altSoundKey]) return;
+    playBtn.addEventListener('click', () => {
+      if (!action[slot.key]) return;
       try {
-        new Audio(action[altSoundKey]).play().catch(err => {
-          showFeedback(`소리 재생 오류: ${err.message}`, 'error');
+        new Audio(action[slot.key]).play().catch(err => {
+          showFeedback('소리 재생 오류: ' + err.message, 'error');
         });
       } catch (err) {
-        showFeedback(`소리 재생 오류: ${err.message}`, 'error');
+        showFeedback('소리 재생 오류: ' + err.message, 'error');
       }
     });
 
-    alternate.appendChild(aLabel);
-    alternate.appendChild(aUpload);
-    alternate.appendChild(aPlay);
-    alternate.appendChild(aName);
-    alternate.appendChild(aFileInput);
-
-    altRow.appendChild(primary);
-    altRow.appendChild(alternate);
-    card.appendChild(altRow);
+    slotEl.appendChild(uploadBtn);
+    slotEl.appendChild(fileInput);
+    slotEl.appendChild(playBtn);
+    strip.appendChild(slotEl);
   }
+
+  soundsSection.appendChild(strip);
+
+  // Toggle expand/collapse
+  soundToggle.addEventListener('click', () => {
+    const isOpen = soundsSection.classList.toggle('is-open');
+    soundToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  card.appendChild(soundsSection);
 
   return card;
-}
-
-/**
- * Update (or add) the sound name bar on an existing card.
- */
-function updateSoundName(card, soundName) {
-  let nameEl = card.querySelector('.action-card__sound-name');
-  if (!nameEl) {
-    nameEl = document.createElement('div');
-    nameEl.className = 'action-card__sound-name';
-    card.appendChild(nameEl);
-  }
-  nameEl.textContent = soundName ? `🔊 ${soundName}` : '';
 }
 
 // ── Hotkey recording ──────────────────────────────────────────────────────────
@@ -540,12 +480,14 @@ function addAction(typeDef) {
     hotkey:     { key: '', ctrl: false, shift: false, alt: false },
     percentage: typeDef.hasPct ? 5 : 0,
     ticks:      typeDef.hasTicks ? 1 : 0,
-    sound:         null,
-    soundName:     null,
-    soundAdd:      null,
-    soundAddName:  null,
-    soundLoss:     null,
-    soundLossName: null
+    sound:           null,
+    soundName:       null,
+    soundAdd:        null,
+    soundAddName:    null,
+    soundProfit:     null,
+    soundProfitName: null,
+    soundLoss:       null,
+    soundLossName:   null
   };
   currentActions.push(newAction);
   const card = renderActionCard(newAction);
@@ -629,12 +571,14 @@ function collectActions() {
       hotkey:    hotkey,
       percentage: percentage,
       ticks:     ticks,
-      sound:         existing.sound || null,
-      soundName:     existing.soundName || null,
-      soundAdd:      existing.soundAdd || null,
-      soundAddName:  existing.soundAddName || null,
-      soundLoss:     existing.soundLoss || null,
-      soundLossName: existing.soundLossName || null
+      sound:           existing.sound || null,
+      soundName:       existing.soundName || null,
+      soundAdd:        existing.soundAdd || null,
+      soundAddName:    existing.soundAddName || null,
+      soundProfit:     existing.soundProfit || null,
+      soundProfitName: existing.soundProfitName || null,
+      soundLoss:       existing.soundLoss || null,
+      soundLossName:   existing.soundLossName || null
     };
   });
 }
