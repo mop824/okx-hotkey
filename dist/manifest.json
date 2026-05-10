@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TeamMelona OKX Hotkey",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Keyboard shortcut trading for OKX — DOM-based, no API keys required",
   "permissions": [
     "storage",
@@ -25,7 +25,8 @@
         "content/executor.js",
         "content/overlay.js",
         "content/actions.js",
-        "content/main.js"
+        "content/main.js",
+        "content/update-toast.js"
       ],
       "css": ["styles/overlay.css"],
       "run_at": "document_idle",
