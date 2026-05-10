@@ -25,6 +25,7 @@
         "content/executor.js",
         "content/overlay.js",
         "content/actions.js",
+        "content/selectors-monitor.js",
         "content/main.js",
         "content/update-toast.js"
       ],
