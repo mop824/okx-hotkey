@@ -7,3 +7,4 @@ build.js
 package.json
 package-lock.json
 node_modules/
+.chrome-profile-monitor/

@@ -1,0 +1,13 @@
+{
+  "target_url": "https://www.okx.com/trade-spot/btc-usdt",
+  "page_load_timeout_ms": 30000,
+  "selector_check_timeout_ms": 5000,
+  "selectors": {
+    "lastPrice": "span.last"
+  },
+  "_selectors_pending_login": {
+    "_note": "These require login or delayed render — excluded from headless monitoring",
+    "orderBookContainer": ".order-book-box",
+    "orderTypeTab":       ".okui-tabs-pane-spacing[role=\"tab\"]"
+  }
+}
