@@ -296,6 +296,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 
+  if (msg.type === 'REPORT_SELECTOR_FAILURE') {
+    sendReport(msg.payload).catch(err => console.error('[OKX Report] sendReport error:', err));
+    return false; // no response needed
+  }
+
   return false;
 });
 

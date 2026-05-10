@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "TeamMelona OKX Hotkey",
+  "version": "1.2.6",
+  "description": "Keyboard shortcut trading for OKX — DOM-based, no API keys required",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://www.okx.com/trade-*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.okx.com/trade-*"],
+      "js": [
+        "content/selectors.js",
+        "content/detector.js",
+        "content/reader.js",
+        "content/executor.js",
+        "content/overlay.js",
+        "content/actions.js",
+        "content/selectors-monitor.js",
+        "content/main.js",
+        "content/update-toast.js"
+      ],
+      "css": ["styles/overlay.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
