@@ -1,1 +1,63 @@
-const _0x5ebba2=_0x14bb;function _0x14bb(_0x26cada,_0x4911af){_0x26cada=_0x26cada-0x1e9;const _0x45deb9=_0x45de();let _0x14bbea=_0x45deb9[_0x26cada];return _0x14bbea;}(function(_0x3cbd38,_0x1cf335){const _0x4b99fd=_0x14bb,_0x2a2055=_0x3cbd38();while(!![]){try{const _0x4be4a1=-parseInt(_0x4b99fd(0x1f7))/0x1+-parseInt(_0x4b99fd(0x200))/0x2+parseInt(_0x4b99fd(0x20a))/0x3+parseInt(_0x4b99fd(0x203))/0x4+parseInt(_0x4b99fd(0x1fd))/0x5*(parseInt(_0x4b99fd(0x1fa))/0x6)+parseInt(_0x4b99fd(0x1ff))/0x7*(parseInt(_0x4b99fd(0x1ed))/0x8)+parseInt(_0x4b99fd(0x1e9))/0x9;if(_0x4be4a1===_0x1cf335)break;else _0x2a2055['push'](_0x2a2055['shift']());}catch(_0x3804b9){_0x2a2055['push'](_0x2a2055['shift']());}}}(_0x45de,0x1cea6));const ENVIRONMENT_DEFAULT={'orderForm':_0x5ebba2(0x1f3),'priceInputContainer':'.price-input','inputField':_0x5ebba2(0x204),'orderTypeTab':_0x5ebba2(0x205),'submitBuy':'button.okui-positivebutton','submitSell':_0x5ebba2(0x20c),'directionTab':_0x5ebba2(0x1fc),'availableBalance':_0x5ebba2(0x1ea),'maxTrade':_0x5ebba2(0x1f4),'sliderNode':_0x5ebba2(0x1ec),'sliderNodeText':_0x5ebba2(0x208),'lastPrice':'span.last','orderBookContainer':_0x5ebba2(0x201),'orderRow':'.order-table-box\x20.okui-table-row:not([aria-hidden=\x22true\x22])','cancelAllButton':_0x5ebba2(0x1fe),'cancelButton':'button.btn-fill-grey','chaseButton':_0x5ebba2(0x202),'positionRow':_0x5ebba2(0x1f5),'positionLongClass':'.positive-pl','positionShortClass':'.negative-pl','tpslCheckbox':_0x5ebba2(0x20b),'tpPriceInput':_0x5ebba2(0x207),'slPriceInput':_0x5ebba2(0x1ee),'tpslSubTab':_0x5ebba2(0x1f6),'tpslOrderRow':_0x5ebba2(0x1fb)};function _0x45de(){const _0x514614=['19200ldJDEq','input[aria-label=\x22slTriggerPx\x22],\x20input[labelbasic=\x22SL\x20trigger\x20price\x22]','OKX_SELECTORS','lastError','sendMessage','selectors','.place-order-container-common','[data-testid=\x22max-trade\x22]','.position-box\x20.okui-table-row:not([aria-hidden=\x22true\x22])','[role=\x22tab\x22][data-pane-id*=\x22conditional\x22]','179911lfxWyt','GET_SELECTORS','runtime','123996xKgmoo','tr.okui-table-row:not([aria-hidden=\x22true\x22])','.okui-tabs-pane-segmented[role=\x22tab\x22]','25GcntLS','button.cancel-all','28wEIuuN','380934yvvmBA','.order-book-box','[data-testid=\x22chase-order\x22],\x20button[class*=\x22chase\x22],\x20[aria-label*=\x22Chase\x22]','255456Oeeibv','.okui-input-input','.okui-tabs-pane-spacing[role=\x22tab\x22]','object','input[aria-label=\x22tpTriggerPx\x22],\x20input[labelbasic=\x22TP\x20trigger\x20price\x22]','.okui-slider-mark-node-text','assign','508068eHXJjE','.place-order-stop-selector\x20.okui-checkbox-input,\x20[class*=\x22stopSelector\x22]\x20.okui-checkbox-input','button.okui-negativebutton','1283994rWQtPA','[data-testid=\x22max-asset\x22]','vgOcs','.okui-slider-mark-node'];_0x45de=function(){return _0x514614;};return _0x45de();}window[_0x5ebba2(0x1ef)]=Object[_0x5ebba2(0x209)]({},ENVIRONMENT_DEFAULT),chrome[_0x5ebba2(0x1f9)][_0x5ebba2(0x1f1)]({'type':_0x5ebba2(0x1f8)},_0x5d3b04=>{const _0x245ba1=_0x5ebba2,_0x2422ee={'vgOcs':function(_0x5ef8e4,_0x8b8373){return _0x5ef8e4===_0x8b8373;},'eRTUr':_0x245ba1(0x206)};if(chrome[_0x245ba1(0x1f9)][_0x245ba1(0x1f0)])return;_0x5d3b04&&_0x5d3b04[_0x245ba1(0x1f2)]&&_0x2422ee[_0x245ba1(0x1eb)](typeof _0x5d3b04[_0x245ba1(0x1f2)],_0x2422ee['eRTUr'])&&Object[_0x245ba1(0x209)](window[_0x245ba1(0x1ef)],_0x5d3b04[_0x245ba1(0x1f2)]);});
+/**
+ * selectors.js — OKX DOM selector config (dynamic + fallback)
+ *
+ * On startup: requests selectors from background via GET_SELECTORS message.
+ * Background reads chrome.storage.local (populated by selectors-fetcher.js).
+ * Falls back to ENVIRONMENT_DEFAULT if background does not respond or
+ * storage is empty.
+ *
+ * Static values below (ENVIRONMENT_DEFAULT) are the canonical fallback.
+ * They match selectors-fetcher.js ENVIRONMENT_DEFAULT exactly.
+ */
+
+// ── ENVIRONMENT_DEFAULT ───────────────────────────────────────────────────────
+const ENVIRONMENT_DEFAULT = {
+  orderForm:            '.place-order-container-common',
+  priceInputContainer:  '.price-input',
+  inputField:           '.okui-input-input',
+  orderTypeTab:         '.okui-tabs-pane-spacing[role="tab"]',
+  submitBuy:            'button.okui-positivebutton',
+  submitSell:           'button.okui-negativebutton',
+  directionTab:         '.okui-tabs-pane-segmented[role="tab"]',
+  availableBalance:     '[data-testid="max-asset"]',
+  maxTrade:             '[data-testid="max-trade"]',
+  sliderNode:           '.okui-slider-mark-node',
+  sliderNodeText:       '.okui-slider-mark-node-text',
+  lastPrice:            'span.last',
+  orderBookContainer:   '.order-book-box',
+  orderRow:             '.order-table-box .okui-table-row:not([aria-hidden="true"])',
+  cancelAllButton:      'button.cancel-all',
+  cancelButton:         'button.btn-fill-grey',
+  chaseButton:          '[data-testid="chase-order"], button[class*="chase"], [aria-label*="Chase"]',
+  positionRow:          '.position-box .okui-table-row:not([aria-hidden="true"])',
+  positionLongClass:    '.positive-pl',
+  positionShortClass:   '.negative-pl',
+  tpslCheckbox:         '.place-order-stop-selector .okui-checkbox-input, [class*="stopSelector"] .okui-checkbox-input',
+  tpPriceInput:         'input[aria-label="tpTriggerPx"], input[labelbasic="TP trigger price"]',
+  slPriceInput:         'input[aria-label="slTriggerPx"], input[labelbasic="SL trigger price"]',
+  tpslSubTab:           '[role="tab"][data-pane-id*="conditional"]',
+  tpslOrderRow:         'tr.okui-table-row:not([aria-hidden="true"])',
+};
+
+// Initialise with defaults immediately so other content scripts can use
+// window.OKX_SELECTORS synchronously before the async response arrives.
+window.OKX_SELECTORS = Object.assign({}, ENVIRONMENT_DEFAULT);
+
+// ── Context guard ─────────────────────────────────────────────────────────────
+function _selectorContextAlive() {
+  try { return !!(chrome.runtime && chrome.runtime.id); } catch (e) { return false; }
+}
+
+// ── Dynamic load ──────────────────────────────────────────────────────────────
+// Request stored selectors from background (populated by selectors-fetcher.js).
+// Update window.OKX_SELECTORS in-place so all existing references see the update.
+if (_selectorContextAlive()) {
+  try {
+    chrome.runtime.sendMessage({ type: 'GET_SELECTORS' }, (response) => {
+      if (chrome.runtime.lastError) return; // background not ready — keep defaults
+      if (response && response.selectors && typeof response.selectors === 'object') {
+        Object.assign(window.OKX_SELECTORS, response.selectors);
+      }
+    });
+  } catch (_) { /* extension context invalidated — keep ENVIRONMENT_DEFAULT */ }
+}

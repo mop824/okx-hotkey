@@ -1,1 +1,193 @@
-(function(_0x20b5a6,_0xc4adeb){const _0x3f6dd0=_0x20d4,_0x52eec5=_0x20b5a6();while(!![]){try{const _0x38bab9=-parseInt(_0x3f6dd0(0xeb))/0x1+-parseInt(_0x3f6dd0(0xb8))/0x2*(parseInt(_0x3f6dd0(0xe0))/0x3)+parseInt(_0x3f6dd0(0xdf))/0x4*(-parseInt(_0x3f6dd0(0xab))/0x5)+parseInt(_0x3f6dd0(0x9b))/0x6+parseInt(_0x3f6dd0(0xbf))/0x7*(parseInt(_0x3f6dd0(0xaf))/0x8)+-parseInt(_0x3f6dd0(0xe1))/0x9+parseInt(_0x3f6dd0(0x9d))/0xa;if(_0x38bab9===_0xc4adeb)break;else _0x52eec5['push'](_0x52eec5['shift']());}catch(_0x5eceae){_0x52eec5['push'](_0x52eec5['shift']());}}}(_0x38dd,0x20b01));function _0x38dd(){const _0x5e5787=['aHRFA','735840cnnYyI','DPZwj','LwZyS','querySelectorAll','positionRow','cyyED','tKBlI','querySelector','twXep','103054xTbjxZ','OcZus','yCkgZ','mpiHB','lastError','OKX_SELECTORS','a[href*=\x22/account/login\x22]','14qLXiDb','length','yoAVT','checked','[data-testid=\x22max-asset\x22]','tNRgw','location','userAgent','chaseButton','EekPh','gJzis','aejIO','VVcGo','rDhPI','.position-box','yvLEA','trim','zjkTy','FiipO','includes','hzmze','availableBalance','KDmzk','kuAjd','href','Ygoop','wkgUL','maxTrade','page_load_miss','orderRow','PLTJI','swap','4sHktye','9JJdRZB','1259865BgHBeI','AurBz','runtime','/trade-margin/','spot','margin','FHNFc','set','uTtDK','kbrCt','109226qstEtS','bGLgI','cancelButton','futures','unknown','zFEzw','click_miss','jqGUB','storage','msNZW','dKCcM','jXoFO','test','SunCe','options','pathname','AoDQR','jDYNS','positionShortClass','now','1205532qWkWPI','SWjwB','2810980lymUCt','cancelAllButton','local','DAvbZ','NHYTF','rAYLJ','/trade-swap/','sendMessage','REPORT_SELECTOR_FAILURE','.place-order-stop-selector\x20.okui-checkbox-input,\x20[class*=\x22stopSelector\x22]\x20.okui-checkbox-input','dWijY','cIWDr','gSdac','get','641495RsQcvE','textContent','fBSpK'];_0x38dd=function(){return _0x5e5787;};return _0x38dd();};function _0x20d4(_0x3fdfea,_0x3f97ff){_0x3fdfea=_0x3fdfea-0x8e;const _0x38dd74=_0x38dd();let _0x20d4f7=_0x38dd74[_0x3fdfea];return _0x20d4f7;}(function OKXSelectorsMonitor(){'use strict';const _0x1f08a0=_0x20d4,_0x42ebef={'aejIO':'/trade-spot/','DPZwj':_0x1f08a0(0xe5),'wbeOb':_0x1f08a0(0xa3),'AurBz':_0x1f08a0(0xde),'zFEzw':'/trade-futures/','DAvbZ':_0x1f08a0(0xe4),'twXep':_0x1f08a0(0xe6),'Ygoop':_0x1f08a0(0x95),'SunCe':_0x1f08a0(0xef),'NHYTF':_0x1f08a0(0xc3),'fBSpK':function(_0x59b14c,_0x1322e1){return _0x59b14c!==_0x1322e1;},'uTtDK':_0x1f08a0(0xbe),'jDYNS':function(_0x5c7038,_0x32c69f){return _0x5c7038===_0x32c69f;},'cIWDr':_0x1f08a0(0x97),'WUZcA':_0x1f08a0(0xcd),'LwZyS':'.order-table-box','Vodhd':function(_0x453029,_0x25b6ef){return _0x453029>=_0x25b6ef;},'jXoFO':function(_0x111df1,_0x57ce81){return _0x111df1-_0x57ce81;},'tKBlI':function(_0x28955c,_0x351673){return _0x28955c!==_0x351673;},'tNRgw':_0x1f08a0(0x8e),'yCkgZ':function(_0x5df4f9,_0x36217a){return _0x5df4f9(_0x36217a);},'FHNFc':_0x1f08a0(0xee),'gSdac':function(_0x449674,_0x444e8b,_0x3f7a88){return _0x449674(_0x444e8b,_0x3f7a88);},'msNZW':'page_load_miss','rAYLJ':_0x1f08a0(0xd5),'dKCcM':_0x1f08a0(0xcb),'EekPh':'[class*=\x22place-order\x22],\x20[class*=\x22trade-panel\x22]','bGLgI':function(_0x411f20){return _0x411f20();},'kuAjd':function(_0x52d4a2){return _0x52d4a2();},'OcZus':function(_0x12b4a1,_0x37b141){return _0x12b4a1===_0x37b141;},'SWjwB':function(_0x13973a,_0x2a8e4a){return _0x13973a===_0x2a8e4a;},'ATeZg':_0x1f08a0(0xa7),'zjkTy':_0x1f08a0(0xbb),'gJzis':function(_0x2b6b9e,_0x4b39de,_0x183b4b){return _0x2b6b9e(_0x4b39de,_0x183b4b);},'cyyED':_0x1f08a0(0xf1),'aHRFA':function(_0x36f37d,_0x1d0448){return _0x36f37d*_0x1d0448;},'yvLEA':'selector_fail_ts_','PJJFY':_0x1f08a0(0xd4),'veOaq':_0x1f08a0(0xda),'FiipO':_0x1f08a0(0xdc),'tpldY':_0x1f08a0(0x9e),'hzmze':_0x1f08a0(0xed),'rDhPI':_0x1f08a0(0xc7),'tOovg':_0x1f08a0(0xb3),'bZERa':'positionLongClass','wkgUL':_0x1f08a0(0x99),'kbrCt':'tpslOrderRow'};const _0x317eb4=_0x42ebef[_0x1f08a0(0xae)](0x5,0x3c)*0x3e8,_0x37b731=_0x42ebef[_0x1f08a0(0xce)];function _0x1dfe55(){const _0x3bc21d=_0x1f08a0,_0x2cca53=window['location'][_0x3bc21d(0x96)];if(_0x2cca53[_0x3bc21d(0xd2)](_0x42ebef[_0x3bc21d(0xca)]))return _0x42ebef[_0x3bc21d(0xb0)];if(_0x2cca53[_0x3bc21d(0xd2)](_0x42ebef['wbeOb']))return _0x42ebef[_0x3bc21d(0xe2)];if(_0x2cca53[_0x3bc21d(0xd2)](_0x42ebef[_0x3bc21d(0xf0)]))return'futures';if(_0x2cca53[_0x3bc21d(0xd2)](_0x42ebef[_0x3bc21d(0xa0)]))return _0x42ebef[_0x3bc21d(0xb7)];if(/\/trade-option[s]?\//['test'](_0x2cca53))return _0x42ebef[_0x3bc21d(0xd8)];return _0x42ebef[_0x3bc21d(0x94)];}function _0x4845eb(){const _0x27c3b7=_0x1f08a0;if(document[_0x27c3b7(0xb6)]('a[href*=\x22/account/login\x22]'))return![];const _0x44b45e=document[_0x27c3b7(0xb6)](_0x42ebef[_0x27c3b7(0xa1)]);if(!_0x44b45e)return![];const _0x1036ac=_0x44b45e[_0x27c3b7(0xac)][_0x27c3b7(0xcf)]();return _0x1036ac!==''&&_0x42ebef[_0x27c3b7(0xad)](_0x1036ac,'--')&&!/^0*\.?0*$/[_0x27c3b7(0x93)](_0x1036ac);}function _0x3c0aa0(){const _0x1346ec=_0x1f08a0;if(_0x42ebef[_0x1346ec(0x98)](_0x42ebef['cIWDr'],_0x42ebef[_0x1346ec(0xa8)])){const _0x5248d6=document['querySelector'](_0x1346ec(0xa6));return _0x5248d6&&_0x5248d6[_0x1346ec(0xc2)];}else{if(_0x3ed6a0['querySelector'](_0x42ebef[_0x1346ec(0xe9)]))return![];const _0x5c2047=_0x3305df[_0x1346ec(0xb6)]('[data-testid=\x22max-asset\x22]');if(!_0x5c2047)return![];const _0x3348a6=_0x5c2047[_0x1346ec(0xac)][_0x1346ec(0xcf)]();return _0x42ebef[_0x1346ec(0xad)](_0x3348a6,'')&&_0x42ebef['fBSpK'](_0x3348a6,'--')&&!/^0*\.?0*$/[_0x1346ec(0x93)](_0x3348a6);}}function _0x568f0a(){return!!document['querySelector'](_0x42ebef['WUZcA']);}function _0x4bde43(){const _0x341292=_0x1f08a0;return!!document['querySelector'](_0x42ebef[_0x341292(0xb1)]);}const _0x3e3704={'tpPriceInput':_0x3c0aa0,'slPriceInput':_0x3c0aa0,'positionRow':_0x568f0a,'positionLongClass':_0x568f0a,'positionShortClass':_0x568f0a,'orderRow':_0x4bde43,'cancelAllButton':_0x4bde43,'cancelButton':_0x4bde43,'chaseButton':_0x4bde43,'tpslOrderRow':_0x4bde43},_0x25d1b3={'priceInputContainer':[_0x42ebef[_0x1f08a0(0xe2)]],'directionTab':[_0x1f08a0(0xe5)],'positionRow':[_0x42ebef['AurBz']],'positionLongClass':[_0x42ebef[_0x1f08a0(0xe2)]],'positionShortClass':[_0x42ebef[_0x1f08a0(0xe2)]]},_0xb89b1e=new Set([_0x42ebef['PJJFY'],_0x42ebef['veOaq'],_0x42ebef[_0x1f08a0(0xd1)],_0x42ebef['tpldY'],_0x42ebef[_0x1f08a0(0xd3)],_0x42ebef[_0x1f08a0(0xcc)],_0x42ebef['tOovg'],_0x42ebef['bZERa'],_0x42ebef[_0x1f08a0(0xd9)],_0x42ebef[_0x1f08a0(0xea)]]);async function _0x3ada36(_0x19fe63){const _0x132bb1=_0x1f08a0,_0x4944f4=_0x37b731+_0x19fe63,_0x4563bf=await chrome['storage'][_0x132bb1(0x9f)][_0x132bb1(0xaa)](_0x4944f4);return _0x42ebef['Vodhd'](_0x42ebef[_0x132bb1(0x92)](Date[_0x132bb1(0x9a)](),_0x4563bf[_0x4944f4]||0x0),_0x317eb4);}async function _0x1dff2c(_0x5ec44a){const _0x3ef97b=_0x1f08a0;await chrome[_0x3ef97b(0x8f)][_0x3ef97b(0x9f)][_0x3ef97b(0xe8)]({[_0x37b731+_0x5ec44a]:Date[_0x3ef97b(0x9a)]()});}async function _0x3ff659(_0x3b01e4,_0x55bd23){const _0x29a821=_0x1f08a0,_0x3316db={'JlbFw':_0x29a821(0xa6)};if(_0x42ebef[_0x29a821(0xb5)](_0x42ebef[_0x29a821(0xc4)],_0x42ebef[_0x29a821(0xc4)])){const _0x36b91c=_0x5ca842[_0x29a821(0xb6)](_0x3316db['JlbFw']);return _0x36b91c&&_0x36b91c['checked'];}else{if(!await _0x42ebef[_0x29a821(0xba)](_0x3ada36,_0x3b01e4))return;await _0x42ebef['yCkgZ'](_0x1dff2c,_0x3b01e4),chrome[_0x29a821(0xe3)][_0x29a821(0xa4)]({'type':_0x29a821(0xa5),'payload':{'selector_name':_0x3b01e4,'failure_type':_0x55bd23,'page_url':window[_0x29a821(0xc5)][_0x29a821(0xd7)],'user_agent':navigator[_0x29a821(0xc6)]}},()=>{const _0x536448=_0x29a821;void chrome[_0x536448(0xe3)][_0x536448(0xbc)];});}}function _0x3830f3(){const _0x2c4946=_0x1f08a0,_0x4dffe5={'QJsQh':function(_0x2add00,_0x5724c4){const _0x1830c9=_0x20d4;return _0x42ebef[_0x1830c9(0x98)](_0x2add00,_0x5724c4);},'PLTJI':function(_0xd6dcba,_0x18f637,_0x5b011c){const _0x4d5ac0=_0x20d4;return _0x42ebef[_0x4d5ac0(0xa9)](_0xd6dcba,_0x18f637,_0x5b011c);},'yoAVT':_0x42ebef[_0x2c4946(0x90)]};if(_0x42ebef[_0x2c4946(0x98)](_0x42ebef[_0x2c4946(0xa2)],_0x42ebef[_0x2c4946(0x91)])){const _0x117d06=_0x16df8e[_0x2c4946(0xc5)][_0x2c4946(0x96)];if(_0x117d06[_0x2c4946(0xd2)](_0x42ebef[_0x2c4946(0xca)]))return _0x42ebef[_0x2c4946(0xb0)];if(_0x117d06[_0x2c4946(0xd2)](_0x2c4946(0xa3)))return _0x42ebef[_0x2c4946(0xe2)];if(_0x117d06[_0x2c4946(0xd2)](_0x42ebef['zFEzw']))return _0x42ebef[_0x2c4946(0xe7)];if(_0x117d06[_0x2c4946(0xd2)](_0x42ebef[_0x2c4946(0xa0)]))return _0x2c4946(0xe6);if(/\/trade-option[s]?\//['test'](_0x117d06))return _0x2c4946(0x95);return'unknown';}else{const _0x1b6d37=window[_0x2c4946(0xbd)];if(!_0x1b6d37)return;const _0x466ee1=document['querySelector'](_0x42ebef[_0x2c4946(0xc8)]);if(!_0x466ee1)return;const _0x385cde=_0x42ebef[_0x2c4946(0xec)](_0x1dfe55),_0x1d9e75=_0x42ebef[_0x2c4946(0xd6)](_0x4845eb);for(const [_0x59cfff,_0x11e113]of Object['entries'](_0x1b6d37)){const _0x48a338=_0x25d1b3[_0x59cfff];if(_0x42ebef[_0x2c4946(0xb9)](_0x385cde,_0x2c4946(0xef))&&_0x48a338)continue;if(_0x48a338&&!_0x48a338[_0x2c4946(0xd2)](_0x385cde))continue;if(_0xb89b1e['has'](_0x59cfff)&&!_0x1d9e75)continue;const _0x2cba2b=_0x3e3704[_0x59cfff];if(_0x2cba2b&&!_0x2cba2b())continue;try{_0x42ebef[_0x2c4946(0xb9)](document[_0x2c4946(0xb2)](_0x11e113)[_0x2c4946(0xc0)],0x0)&&(_0x42ebef[_0x2c4946(0x9c)](_0x42ebef['ATeZg'],_0x42ebef[_0x2c4946(0xd0)])?_0x4dffe5['QJsQh'](_0x1d6e83[_0x2c4946(0xb2)](_0x57e412)[_0x2c4946(0xc0)],0x0)&&_0x4dffe5[_0x2c4946(0xdd)](_0x67cf15,_0x517f79,_0x4dffe5[_0x2c4946(0xc1)]):_0x3ff659(_0x59cfff,_0x2c4946(0xdb)));}catch(_0x15f21f){}}}}window['OKXMonitor']={'reportClickMiss':function(_0x50d64f){const _0x331422=_0x1f08a0;_0x42ebef[_0x331422(0xc9)](_0x3ff659,_0x50d64f,_0x42ebef[_0x331422(0xb4)]);}},_0x42ebef['gSdac'](setTimeout,_0x3830f3,0x1388);}());
+/**
+ * selectors-monitor.js — Detects broken OKX DOM selectors and reports to server
+ *
+ * Signal 1: All OKX_SELECTORS keys (page-context filtered) missing 5s after load
+ * Signal 2: Click handler couldn't find a target element (called by executor.js
+ *           via window.OKXMonitor.reportClickMiss)
+ *
+ * Guards:
+ *   - Page context: spot / swap / futures (URL-based)
+ *   - Login guard: skips login_required selectors when not authenticated
+ *   - Conditional guard: tpPriceInput/slPriceInput only when TPSL checked,
+ *                        positionRow/positionLongClass/positionShortClass only
+ *                        when position panel is visible,
+ *                        orderRow/cancelAllButton/cancelButton/chaseButton/tpslOrderRow
+ *                        only when open-orders table is visible
+ *
+ * Debounce: same selector_name → at most 1 report per 5 minutes
+ * (chrome.storage.local key: "selector_fail_ts_<name>")
+ */
+
+;(function OKXSelectorsMonitor() {
+  'use strict';
+
+  const DEBOUNCE_MS        = 5 * 60 * 1000;
+  const STORAGE_KEY_PREFIX = 'selector_fail_ts_';
+
+  // ── Context guard ────────────────────────────────────────────────────────────
+  function _monitorContextAlive() {
+    try { return !!(chrome.runtime && chrome.runtime.id); } catch (e) { return false; }
+  }
+
+  // ── Page context ────────────────────────────────────────────────────────────
+
+  function getPageType() {
+    const p = window.location.pathname;
+    if (p.includes('/trade-spot/'))           return 'spot';
+    if (p.includes('/trade-swap/'))           return 'swap';
+    if (p.includes('/trade-futures/'))        return 'futures';
+    if (p.includes('/trade-margin/'))         return 'margin';
+    if (/\/trade-option[s]?\//.test(p))       return 'options';
+    return 'unknown';
+  }
+
+  // ── Login guard (priority-based, NOT a vote count) ─────────────────────────
+  // Rule 1 (veto): login anchor present → not logged in.
+  // Rule 2: real balance value → logged in (avatar class unstable, not required).
+  // Rule 3: ambiguous → not logged in (safe default).
+
+  function isLoggedIn() {
+    if (document.querySelector('a[href*="/account/login"]')) return false;
+    const balanceEl = document.querySelector('[data-testid="max-asset"]');
+    if (!balanceEl) return false;
+    const t = balanceEl.textContent.trim();
+    return t !== '' && t !== '--' && !/^0*\.?0*$/.test(t);
+  }
+
+  // ── Conditional activation checks ──────────────────────────────────────────
+
+  function isTpslActive() {
+    const cb = document.querySelector(
+      '.place-order-stop-selector .okui-checkbox-input, [class*="stopSelector"] .okui-checkbox-input'
+    );
+    return cb && cb.checked;
+  }
+
+  function isPositionPanelVisible() {
+    return !!document.querySelector('.position-box');
+  }
+
+  function isOpenOrdersVisible() {
+    return !!document.querySelector('.order-table-box');
+  }
+
+  // Selectors that are conditional on runtime UI state — cannot be probed at
+  // page-load unless the condition is already met.
+  const CONDITIONAL_GUARDS = {
+    tpPriceInput:     isTpslActive,
+    slPriceInput:     isTpslActive,
+    positionRow:      isPositionPanelVisible,
+    positionLongClass: isPositionPanelVisible,
+    positionShortClass: isPositionPanelVisible,
+    orderRow:         isOpenOrdersVisible,
+    cancelAllButton:  isOpenOrdersVisible,
+    cancelButton:     isOpenOrdersVisible,
+    chaseButton:      isOpenOrdersVisible,
+    tpslOrderRow:     isOpenOrdersVisible,
+  };
+
+  // Selectors that only apply to specific page types (non-exhaustive — keys not
+  // listed here are checked on all pages). Values: array of page types.
+  const PAGE_SCOPE = {
+    priceInputContainer: ['swap'],
+    directionTab:        ['spot'],
+    positionRow:         ['swap'],
+    positionLongClass:   ['swap'],
+    positionShortClass:  ['swap'],
+    // submitSell is spot-tab-toggled but still present in DOM on spot for some
+    // states — omit from PAGE_SCOPE to let the presence check handle it.
+  };
+
+  // Selectors that require an authenticated session to be present in DOM.
+  const LOGIN_REQUIRED = new Set([
+    'availableBalance', 'maxTrade',
+    'orderRow', 'cancelAllButton', 'cancelButton', 'chaseButton',
+    'positionRow', 'positionLongClass', 'positionShortClass', 'tpslOrderRow',
+  ]);
+
+  // ── Debounce ────────────────────────────────────────────────────────────────
+
+  async function canReport(selectorName) {
+    if (!_monitorContextAlive()) return false;
+    const key = STORAGE_KEY_PREFIX + selectorName;
+    try {
+      const result = await chrome.storage.local.get(key);
+      return Date.now() - (result[key] || 0) >= DEBOUNCE_MS;
+    } catch (_) { return false; } // extension context invalidated
+  }
+
+  async function markReported(selectorName) {
+    if (!_monitorContextAlive()) return;
+    try {
+      await chrome.storage.local.set({ [STORAGE_KEY_PREFIX + selectorName]: Date.now() });
+    } catch (_) { /* extension context invalidated */ }
+  }
+
+  // ── Report ──────────────────────────────────────────────────────────────────
+
+  async function triggerReport(selectorName, failureType) {
+    if (!await canReport(selectorName)) return;
+    await markReported(selectorName);
+    if (!_monitorContextAlive()) return;
+    try {
+      chrome.runtime.sendMessage({
+        type: 'REPORT_SELECTOR_FAILURE',
+        payload: {
+          selector_name: selectorName,
+          failure_type:  failureType,
+          page_url:      window.location.href,
+          user_agent:    navigator.userAgent,
+        }
+      }, () => { void chrome.runtime.lastError; });
+    } catch (_) { /* extension context invalidated */ }
+  }
+
+  // ── Signal 1: page-load probe ───────────────────────────────────────────────
+
+  function probeSelectors() {
+    const S = window.OKX_SELECTORS;
+    if (!S) return;
+
+    // Abort if the trade-form container itself is missing — not a trade page
+    const tradePageHint = document.querySelector('[class*="place-order"], [class*="trade-panel"]');
+    if (!tradePageHint) return;
+
+    const pageType = getPageType();
+    const loggedIn = isLoggedIn();
+
+    for (const [name, selector] of Object.entries(S)) {
+      // page-scope filter: unknown page → only probe 'all'-scoped selectors
+      const scope = PAGE_SCOPE[name];
+      if (pageType === 'unknown' && scope) continue;   // has explicit scope → skip on unknown page
+      if (scope && !scope.includes(pageType)) continue;
+
+      // login guard
+      if (LOGIN_REQUIRED.has(name) && !loggedIn) continue;
+
+      // conditional guard — condition not met → skip (not a breakage)
+      const guard = CONDITIONAL_GUARDS[name];
+      if (guard && !guard()) continue;
+
+      try {
+        if (document.querySelectorAll(selector).length === 0) {
+          triggerReport(name, 'page_load_miss');
+        }
+      } catch (_) {
+        // invalid CSS — skip
+      }
+    }
+  }
+
+  // ── Signal 2: click handler miss (called by executor.js) ───────────────────
+
+  window.OKXMonitor = {
+    reportClickMiss: function(selectorName) {
+      triggerReport(selectorName, 'click_miss');
+    }
+  };
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+
+  setTimeout(probeSelectors, 5000);
+
+})();

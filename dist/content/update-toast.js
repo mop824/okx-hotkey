@@ -1,1 +1,176 @@
-function _0xa81d(_0x2f3ece,_0x5f4166){_0x2f3ece=_0x2f3ece-0x70;const _0x1810d5=_0x1810();let _0xa81d80=_0x1810d5[_0x2f3ece];return _0xa81d80;}(function(_0x439a77,_0x5ba600){const _0x3f1666=_0xa81d,_0x1bbe67=_0x439a77();while(!![]){try{const _0x93aa76=parseInt(_0x3f1666(0xc5))/0x1+parseInt(_0x3f1666(0xc9))/0x2*(parseInt(_0x3f1666(0xb3))/0x3)+-parseInt(_0x3f1666(0xc2))/0x4+-parseInt(_0x3f1666(0xa9))/0x5+parseInt(_0x3f1666(0xb2))/0x6+parseInt(_0x3f1666(0x73))/0x7+-parseInt(_0x3f1666(0xbc))/0x8;if(_0x93aa76===_0x5ba600)break;else _0x1bbe67['push'](_0x1bbe67['shift']());}catch(_0x2f7b1f){_0x1bbe67['push'](_0x1bbe67['shift']());}}}(_0x1810,0xbda1f));;(function OKXUpdateToast(){'use strict';const _0x39267f=_0xa81d,_0x313c73={'uBdMH':function(_0x5a3652,_0x4eafca){return _0x5a3652!==_0x4eafca;},'gornO':_0x39267f(0xcf),'cMCBa':function(_0x4ebca0,_0x2e33fc,_0x2ce21d){return _0x4ebca0(_0x2e33fc,_0x2ce21d);},'vVwcL':function(_0x19b43a,_0x26dd51){return _0x19b43a!==_0x26dd51;},'GOXvd':_0x39267f(0xcc),'ZXiek':'_blank','RQriW':function(_0x2ef27b){return _0x2ef27b();},'yVTow':_0x39267f(0xae),'leLPl':_0x39267f(0xb7),'RxOxE':function(_0x27d78b){return _0x27d78b();},'JapWt':_0x39267f(0x7f),'eOrmq':'closed','UxmYl':'style','sdtiA':_0x39267f(0x85),'GlTgE':_0x39267f(0x8a),'ZDaRa':_0x39267f(0x98),'CbYyV':_0x39267f(0xb5),'vRukz':_0x39267f(0xca),'ZhruS':_0x39267f(0x8e),'lHFPu':_0x39267f(0xa5),'logrG':_0x39267f(0x78),'eBQSx':function(_0x4a8509,_0x1b46f1){return _0x4a8509===_0x1b46f1;},'GwGrs':_0x39267f(0x7c),'vOACa':'Sidep','LwlTr':function(_0xbd57fe,_0x30932b){return _0xbd57fe<_0x30932b;},'jJywq':function(_0x48bcfd,_0xe50d91){return _0x48bcfd-_0xe50d91;},'MoOGf':function(_0x237bc3,_0x24b5b5){return _0x237bc3>_0x24b5b5;},'dQOYs':function(_0x1c3446,_0x2c172e){return _0x1c3446===_0x2c172e;},'iapQe':function(_0x3e40c7,_0x252893){return _0x3e40c7<_0x252893;},'jvpwi':function(_0x377040,_0x99ce73,_0x13ce55){return _0x377040(_0x99ce73,_0x13ce55);},'pFWtg':function(_0x5e0c2e,_0x35874e){return _0x5e0c2e!==_0x35874e;},'dBZra':function(_0x43a6db){return _0x43a6db();},'RHuNA':function(_0x426c38){return _0x426c38();},'fVURW':'wrap','WgIid':function(_0x2ce17d,_0x9e546c){return _0x2ce17d!==_0x9e546c;},'ijoqB':function(_0x24078f,_0x10d87d){return _0x24078f!==_0x10d87d;},'ZEWZF':'JozvA','XmdMB':_0x39267f(0xa3),'BhEZy':_0x39267f(0xa0),'fozIW':_0x39267f(0x9d),'ZjPqq':function(_0xb529df,_0x7792ef,_0x1abd03){return _0xb529df(_0x7792ef,_0x1abd03);},'PEvGA':_0x39267f(0xa4),'pcEWv':_0x39267f(0xba),'MkPfE':'dismissed_version'};const _0x56b2f8=_0x39267f(0xc3);function _0x1fb752(){const _0x5b1462=_0x39267f;if(_0x313c73[_0x5b1462(0x9e)](_0x5b1462(0x72),_0x313c73[_0x5b1462(0xb4)])){const _0x421d50=document[_0x5b1462(0x8d)](_0x56b2f8);if(_0x421d50)_0x421d50[_0x5b1462(0xbf)][_0x5b1462(0x7a)](_0x421d50);}else return;}function _0x13bf57(_0x533700,_0x89c348){const _0x19aa78=_0x39267f;if(_0x313c73[_0x19aa78(0xd0)]===_0x313c73[_0x19aa78(0x7d)])_0x313c73[_0x19aa78(0xce)](_0xac7128,_0x33df65['latest_version'],_0x3df10f[_0x19aa78(0xba)]);else{_0x313c73['RxOxE'](_0x1fb752);const _0x44aa49=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0xb6)]);_0x44aa49['id']=_0x56b2f8;const _0x4af0b6=_0x44aa49[_0x19aa78(0x80)]({'mode':_0x313c73[_0x19aa78(0xc8)]}),_0x4d2317=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0xaf)]);_0x4d2317[_0x19aa78(0x76)]=_0x19aa78(0x89);const _0x340933=document['createElement'](_0x19aa78(0x7f));_0x340933[_0x19aa78(0xb0)]=_0x19aa78(0xa8);const _0x56a2e9=document[_0x19aa78(0x86)](_0x313c73['sdtiA']);_0x56a2e9['className']=_0x313c73[_0x19aa78(0x84)],_0x56a2e9[_0x19aa78(0x76)]='🔔';const _0x453d2f=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0xb6)]);_0x453d2f[_0x19aa78(0xb0)]=_0x313c73[_0x19aa78(0x77)];const _0x9755f9=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0xb6)]);_0x9755f9[_0x19aa78(0xb0)]=_0x313c73[_0x19aa78(0x87)],_0x9755f9[_0x19aa78(0x76)]=_0x19aa78(0xbb)+_0x533700+_0x19aa78(0x9b);const _0x596a41=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0xb6)]);_0x596a41['className']=_0x313c73['vRukz'];const _0x3d523d=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0x99)]);_0x3d523d[_0x19aa78(0xb0)]=_0x313c73[_0x19aa78(0xa6)],_0x3d523d[_0x19aa78(0x76)]='받기';const _0xa6d3db=/^https:\/\/(github\.com\/mop824\/okx-hotkey\/|objects\.githubusercontent\.com\/)/;_0x3d523d[_0x19aa78(0xa7)](_0x313c73[_0x19aa78(0xc4)],()=>{const _0x477e23=_0x19aa78;if(_0x313c73['vVwcL'](_0x313c73[_0x477e23(0x9f)],_0x313c73[_0x477e23(0x9f)]))_0x2a5be1[_0x477e23(0x92)]['local'][_0x477e23(0x97)]({'dismissed_version':_0x49449c}),_0x1619da();else{if(_0x89c348&&_0xa6d3db[_0x477e23(0x83)](_0x89c348))window['open'](_0x89c348,_0x313c73[_0x477e23(0x9a)]);}});const _0xc5ef4e=document[_0x19aa78(0x86)](_0x313c73[_0x19aa78(0x99)]);_0xc5ef4e[_0x19aa78(0xb0)]='btn-close',_0xc5ef4e[_0x19aa78(0x76)]='✕',_0xc5ef4e[_0x19aa78(0xa7)](_0x19aa78(0x78),()=>{const _0x17542a=_0x19aa78;chrome[_0x17542a(0x92)][_0x17542a(0x81)][_0x17542a(0x97)]({'dismissed_version':_0x533700}),_0x313c73[_0x17542a(0x93)](_0x1fb752);}),_0x596a41[_0x19aa78(0xa1)](_0x3d523d),_0x596a41[_0x19aa78(0xa1)](_0xc5ef4e),_0x453d2f[_0x19aa78(0xa1)](_0x9755f9),_0x453d2f[_0x19aa78(0xa1)](_0x596a41),_0x340933['appendChild'](_0x56a2e9),_0x340933[_0x19aa78(0xa1)](_0x453d2f),_0x4af0b6[_0x19aa78(0xa1)](_0x4d2317),_0x4af0b6['appendChild'](_0x340933),document['body'][_0x19aa78(0xa1)](_0x44aa49);}}chrome[_0x39267f(0x92)][_0x39267f(0x81)][_0x39267f(0x96)]([_0x313c73[_0x39267f(0x70)],_0x313c73[_0x39267f(0xc7)],_0x313c73[_0x39267f(0xac)]],_0x237c97=>{const _0x4ba7ca=_0x39267f;if(_0x313c73['vOACa']!==_0x313c73[_0x4ba7ca(0x7e)]){if(_0x32a5c0&&_0x12ef30[_0x4ba7ca(0x83)](_0x53358f))_0x44ef94['open'](_0x546cde,_0x313c73[_0x4ba7ca(0x9a)]);}else{const {latest_version:_0x21d7c8,download_url:_0x22b034,dismissed_version:_0x26a2d2}=_0x237c97;if(!_0x21d7c8)return;if(_0x313c73[_0x4ba7ca(0xb1)](_0x21d7c8,_0x26a2d2))return;try{const _0x11bf79=chrome[_0x4ba7ca(0xbe)][_0x4ba7ca(0x8f)]()[_0x4ba7ca(0x95)],_0x107a84=_0x21d7c8[_0x4ba7ca(0xcb)](/^v/,'')[_0x4ba7ca(0xaa)]('.')[_0x4ba7ca(0xa2)](_0x2f1d94=>parseInt(_0x2f1d94,0xa)||0x0),_0x3a263a=_0x11bf79[_0x4ba7ca(0xcb)](/^v/,'')[_0x4ba7ca(0xaa)]('.')[_0x4ba7ca(0xa2)](_0x2599b9=>parseInt(_0x2599b9,0xa)||0x0);let _0x443685=![];for(let _0x910921=0x0;_0x313c73[_0x4ba7ca(0x9c)](_0x910921,Math[_0x4ba7ca(0x8b)](_0x107a84[_0x4ba7ca(0x90)],_0x3a263a[_0x4ba7ca(0x90)]));_0x910921++){const _0x2b324d=_0x313c73[_0x4ba7ca(0xc0)](_0x107a84[_0x910921]||0x0,_0x3a263a[_0x910921]||0x0);if(_0x313c73['MoOGf'](_0x2b324d,0x0)){if(_0x313c73[_0x4ba7ca(0x79)]('Ylodt','Ylodt')){_0x443685=!![];break;}else{try{if(_0x313c73[_0x4ba7ca(0x7b)](_0x3b5be3['id'],_0x10fcee[_0x4ba7ca(0xbe)]['id']))return;}catch(_0x462ba6){return;}_0x313c73[_0x4ba7ca(0xb1)](_0x444446[_0x4ba7ca(0xc1)],_0x313c73[_0x4ba7ca(0xb8)])&&_0x313c73[_0x4ba7ca(0xce)](_0x3d2686,_0x2f4713['latest_version'],_0xb92765['download_url']);}}if(_0x313c73[_0x4ba7ca(0x82)](_0x2b324d,0x0))break;}if(_0x443685)_0x313c73[_0x4ba7ca(0x94)](_0x13bf57,_0x21d7c8,_0x22b034);}catch(_0x1d3077){}}}),chrome[_0x39267f(0xbe)][_0x39267f(0xbd)]['addListener']((_0x2ee4fa,_0x151df6)=>{const _0x188de6=_0x39267f,_0x25adf7={'qsOZg':_0x313c73[_0x188de6(0x9a)]};try{if(_0x313c73[_0x188de6(0x71)](_0x151df6['id'],chrome[_0x188de6(0xbe)]['id']))return;}catch(_0x18c91d){if(_0x313c73[_0x188de6(0x91)](_0x313c73[_0x188de6(0xc6)],_0x313c73['XmdMB']))return;else{if(_0x313c73[_0x188de6(0xad)](_0x2563ac['id'],_0x42259f[_0x188de6(0xbe)]['id']))return;}}if(_0x2ee4fa['type']===_0x313c73[_0x188de6(0xb8)]){if(_0x313c73[_0x188de6(0x91)](_0x313c73[_0x188de6(0x74)],_0x313c73[_0x188de6(0xb9)]))_0x313c73['ZjPqq'](_0x13bf57,_0x2ee4fa[_0x188de6(0xa4)],_0x2ee4fa[_0x188de6(0xba)]);else{const _0x3f70d7={'BtcUR':function(_0x5056cd){return _0x313c73['dBZra'](_0x5056cd);}};_0x313c73[_0x188de6(0x8c)](_0x183671);const _0x116a88=_0x16e759['createElement'](_0x313c73['JapWt']);_0x116a88['id']=_0x31f170;const _0x341aec=_0x116a88[_0x188de6(0x80)]({'mode':_0x313c73[_0x188de6(0xc8)]}),_0x551035=_0x570105[_0x188de6(0x86)](_0x313c73[_0x188de6(0xaf)]);_0x551035[_0x188de6(0x76)]=_0x188de6(0x89);const _0x43905d=_0x2d5f02['createElement'](_0x313c73[_0x188de6(0xb6)]);_0x43905d[_0x188de6(0xb0)]=_0x313c73['fVURW'];const _0x36470c=_0x43994f[_0x188de6(0x86)](_0x313c73[_0x188de6(0xd1)]);_0x36470c[_0x188de6(0xb0)]=_0x188de6(0x8a),_0x36470c[_0x188de6(0x76)]='🔔';const _0x12a670=_0x391198[_0x188de6(0x86)](_0x313c73[_0x188de6(0xb6)]);_0x12a670['className']=_0x313c73[_0x188de6(0x77)];const _0x5db263=_0x16692e[_0x188de6(0x86)](_0x313c73[_0x188de6(0xb6)]);_0x5db263[_0x188de6(0xb0)]=_0x313c73[_0x188de6(0x87)],_0x5db263[_0x188de6(0x76)]='새\x20버전\x20'+_0x3430e1+_0x188de6(0x9b);const _0x1d58d9=_0x1d69f1[_0x188de6(0x86)](_0x313c73['JapWt']);_0x1d58d9[_0x188de6(0xb0)]=_0x313c73[_0x188de6(0x88)];const _0x1b2830=_0xf456ec[_0x188de6(0x86)]('button');_0x1b2830[_0x188de6(0xb0)]=_0x188de6(0xa5),_0x1b2830[_0x188de6(0x76)]='받기';const _0x28cae3=/^https:\/\/(github\.com\/mop824\/okx-hotkey\/|objects\.githubusercontent\.com\/)/;_0x1b2830[_0x188de6(0xa7)](_0x313c73[_0x188de6(0xc4)],()=>{const _0x248182=_0x188de6;if(_0x27e025&&_0x28cae3['test'](_0x20f76f))_0x53e50d[_0x248182(0xcd)](_0x316229,_0x25adf7[_0x248182(0x75)]);});const _0x83672c=_0x9ddfcd[_0x188de6(0x86)](_0x313c73['ZhruS']);_0x83672c[_0x188de6(0xb0)]=_0x188de6(0xab),_0x83672c[_0x188de6(0x76)]='✕',_0x83672c[_0x188de6(0xa7)](_0x313c73[_0x188de6(0xc4)],()=>{const _0x3dbfee=_0x188de6;_0xf76290[_0x3dbfee(0x92)][_0x3dbfee(0x81)][_0x3dbfee(0x97)]({'dismissed_version':_0x474ae2}),_0x3f70d7['BtcUR'](_0x19ba5d);}),_0x1d58d9[_0x188de6(0xa1)](_0x1b2830),_0x1d58d9[_0x188de6(0xa1)](_0x83672c),_0x12a670[_0x188de6(0xa1)](_0x5db263),_0x12a670[_0x188de6(0xa1)](_0x1d58d9),_0x43905d[_0x188de6(0xa1)](_0x36470c),_0x43905d[_0x188de6(0xa1)](_0x12a670),_0x341aec[_0x188de6(0xa1)](_0x551035),_0x341aec[_0x188de6(0xa1)](_0x43905d),_0x47c0c0[_0x188de6(0x98)][_0x188de6(0xa1)](_0x116a88);}}});}());function _0x1810(){const _0x460c13=['qsOZg','textContent','ZDaRa','click','dQOYs','removeChild','vVwcL','SHOW_UPDATE_TOAST','leLPl','vOACa','div','attachShadow','local','iapQe','test','GlTgE','span','createElement','CbYyV','vRukz','\x0a\x20\x20\x20\x20\x20\x20:host-context(body)\x20{}\x0a\x20\x20\x20\x20\x20\x20.wrap\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x0a\x20\x20\x20\x20\x20\x20\x20\x20bottom:\x2020px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20right:\x2020px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20z-index:\x202147483647;\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20#1e1e2e;\x0a\x20\x20\x20\x20\x20\x20\x20\x20color:\x20#e0e0e0;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border:\x201px\x20solid\x20#3a3a5c;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x2010px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20padding:\x2014px\x2016px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x0a\x20\x20\x20\x20\x20\x20\x20\x20align-items:\x20flex-start;\x0a\x20\x20\x20\x20\x20\x20\x20\x20gap:\x2010px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20min-width:\x20240px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20max-width:\x20320px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20box-shadow:\x200\x204px\x2020px\x20rgba(0,0,0,0.5);\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-family:\x20-apple-system,\x20sans-serif;\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x2013px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20line-height:\x201.4;\x0a\x20\x20\x20\x20\x20\x20\x20\x20animation:\x20slide-in\x200.25s\x20ease;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20@keyframes\x20slide-in\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20from\x20{\x20opacity:\x200;\x20transform:\x20translateY(12px);\x20}\x0a\x20\x20\x20\x20\x20\x20\x20\x20to\x20\x20\x20{\x20opacity:\x201;\x20transform:\x20translateY(0);\x20}\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20.icon\x20{\x20font-size:\x2018px;\x20flex-shrink:\x200;\x20margin-top:\x201px;\x20}\x0a\x20\x20\x20\x20\x20\x20.body\x20{\x20flex:\x201;\x20}\x0a\x20\x20\x20\x20\x20\x20.msg\x20\x20{\x20margin-bottom:\x2010px;\x20font-weight:\x20500;\x20}\x0a\x20\x20\x20\x20\x20\x20.actions\x20{\x20display:\x20flex;\x20gap:\x208px;\x20}\x0a\x20\x20\x20\x20\x20\x20.btn-dl\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20#4f5bd5;\x0a\x20\x20\x20\x20\x20\x20\x20\x20color:\x20#fff;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x206px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20padding:\x205px\x2012px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x2012px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-family:\x20inherit;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20.btn-dl:hover\x20{\x20background:\x20#3a46c0;\x20}\x0a\x20\x20\x20\x20\x20\x20.btn-close\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border:\x201px\x20solid\x20#555;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x206px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20color:\x20#aaa;\x0a\x20\x20\x20\x20\x20\x20\x20\x20padding:\x205px\x2010px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-size:\x2012px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20font-family:\x20inherit;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20.btn-close:hover\x20{\x20background:\x20#2a2a3e;\x20}\x0a\x20\x20\x20\x20','icon','max','RHuNA','getElementById','button','getManifest','length','ijoqB','storage','RQriW','jvpwi','version','get','set','body','ZhruS','ZXiek','\x20떴어','LwlTr','gDxuZ','uBdMH','GOXvd','gpARj','appendChild','map','OnEpJ','latest_version','btn-dl','lHFPu','addEventListener','wrap','576675TMhMkq','split','btn-close','MkPfE','pFWtg','jevrS','UxmYl','className','eBQSx','5057016NrVFxb','1557qgtARb','gornO','msg','JapWt','ZRpae','GwGrs','fozIW','download_url','새\x20버전\x20','17908304iXTPmP','onMessage','runtime','parentNode','jJywq','type','2130744rnPzYY','okx-hotkey-update-toast','logrG','774339XXhpvi','ZEWZF','pcEWv','eOrmq','5708BfySrc','actions','replace','yfNAs','open','cMCBa','YMdQd','yVTow','sdtiA','PEvGA','WgIid','RdUay','3954251IjWhmX','BhEZy'];_0x1810=function(){return _0x460c13;};return _0x1810();}
+/**
+ * update-toast.js — 업데이트 알림 토스트 (우하단 카드)
+ *
+ * 표시 조건:
+ *   1. SHOW_UPDATE_TOAST 메시지 수신 시
+ *   2. 페이지 로드 시 storage에 latest_version 있고 dismissed_version과 다를 때
+ *
+ * 닫기: dismissed_version 저장 → 같은 버전 재표시 안 함
+ * 받기: download_url을 새 탭으로 오픈
+ */
+
+;(function OKXUpdateToast() {
+  'use strict';
+
+  const TOAST_ID = 'okx-hotkey-update-toast';
+
+  // ── Context guard ─────────────────────────────────────────────────────────
+  function _toastContextAlive() {
+    try { return !!(chrome.runtime && chrome.runtime.id); } catch (e) { return false; }
+  }
+
+  function removeExisting() {
+    const el = document.getElementById(TOAST_ID);
+    if (el) el.parentNode.removeChild(el);
+  }
+
+  function showToast(latestVersion, downloadUrl) {
+    removeExisting();
+
+    const host = document.createElement('div');
+    host.id = TOAST_ID;
+
+    // Shadow DOM으로 OKX 페이지 스타일 충돌 차단
+    const shadow = host.attachShadow({ mode: 'closed' });
+
+    const style = document.createElement('style');
+    style.textContent = `
+      :host-context(body) {}
+      .wrap {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 2147483647;
+        background: #1e1e2e;
+        color: #e0e0e0;
+        border: 1px solid #3a3a5c;
+        border-radius: 10px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        min-width: 240px;
+        max-width: 320px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        font-family: -apple-system, sans-serif;
+        font-size: 13px;
+        line-height: 1.4;
+        animation: slide-in 0.25s ease;
+      }
+      @keyframes slide-in {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+      .body { flex: 1; }
+      .msg  { margin-bottom: 10px; font-weight: 500; }
+      .actions { display: flex; gap: 8px; }
+      .btn-dl {
+        background: #4f5bd5;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-dl:hover { background: #3a46c0; }
+      .btn-close {
+        background: none;
+        border: 1px solid #555;
+        border-radius: 6px;
+        color: #aaa;
+        padding: 5px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-close:hover { background: #2a2a3e; }
+    `;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'wrap';
+
+    const icon = document.createElement('span');
+    icon.className = 'icon';
+    icon.textContent = '🔔';
+
+    const body = document.createElement('div');
+    body.className = 'body';
+
+    const msg = document.createElement('div');
+    msg.className = 'msg';
+    msg.textContent = `새 버전 ${latestVersion} 떴어`;
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const btnDl = document.createElement('button');
+    btnDl.className = 'btn-dl';
+    btnDl.textContent = '받기';
+    const SAFE = /^https:\/\/(github\.com\/mop824\/okx-hotkey\/|objects\.githubusercontent\.com\/)/;
+    btnDl.addEventListener('click', () => {
+      if (downloadUrl && SAFE.test(downloadUrl)) window.open(downloadUrl, '_blank');
+    });
+
+    const btnClose = document.createElement('button');
+    btnClose.className = 'btn-close';
+    btnClose.textContent = '✕';
+    btnClose.addEventListener('click', () => {
+      if (_toastContextAlive()) {
+        try { chrome.storage.local.set({ dismissed_version: latestVersion }); } catch (_) { /* extension context invalidated */ }
+      }
+      removeExisting();
+    });
+
+    actions.appendChild(btnDl);
+    actions.appendChild(btnClose);
+    body.appendChild(msg);
+    body.appendChild(actions);
+    wrap.appendChild(icon);
+    wrap.appendChild(body);
+    shadow.appendChild(style);
+    shadow.appendChild(wrap);
+    document.body.appendChild(host);
+  }
+
+  // 페이지 로드 시 storage 체크
+  if (_toastContextAlive()) {
+    try {
+      chrome.storage.local.get(['latest_version', 'download_url', 'dismissed_version'], (result) => {
+        const { latest_version, download_url, dismissed_version } = result;
+        if (!latest_version) return;
+        if (latest_version === dismissed_version) return;
+        // content script도 manifest 버전 접근 가능 — SW 비교를 재확인
+        try {
+          const current = chrome.runtime.getManifest().version;
+          const la = latest_version.replace(/^v/, '').split('.').map(s => parseInt(s, 10) || 0);
+          const lb = current.replace(/^v/, '').split('.').map(s => parseInt(s, 10) || 0);
+          let newer = false;
+          for (let i = 0; i < Math.max(la.length, lb.length); i++) {
+            const diff = (la[i] || 0) - (lb[i] || 0);
+            if (diff > 0) { newer = true; break; }
+            if (diff < 0) break;
+          }
+          if (newer) showToast(latest_version, download_url);
+        } catch (_) {
+          // Extension context 무효 — 표시 건너뜀
+        }
+      });
+    } catch (_) { /* extension context invalidated */ }
+  }
+
+  // SW로부터 메시지 수신
+  chrome.runtime.onMessage.addListener((msg, sender) => {
+    try {
+      if (sender.id !== chrome.runtime.id) return;
+    } catch (_) {
+      return;
+    }
+    if (msg.type === 'SHOW_UPDATE_TOAST') {
+      showToast(msg.latest_version, msg.download_url);
+    }
+  });
+
+})();
