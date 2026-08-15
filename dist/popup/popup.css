@@ -375,6 +375,14 @@ body {
 .card__sounds > * {
   min-height: 0;
   overflow: hidden;
+  /* Padding/border must collapse with the 0fr track: overflow:hidden clips
+     content, not the child's own padding box — without this the strip's
+     4px padding leaks as a sliver under every card (v1.5.1 regression). */
+  transition: padding-block 0.2s ease, border-block-width 0.2s ease;
+}
+.card__sounds:not(.is-open) > * {
+  padding-block: 0;
+  border-block-width: 0;
 }
 .card__sounds.is-open {
   grid-template-rows: 1fr;
