@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: 8px;
   pointer-events: none; /* Don't block clicks on trading UI */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', monospace, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .okx-hotkey-toast {
@@ -53,21 +53,22 @@
     transform 0.3s ease;
 }
 
-/* Type variants */
+/* Type variants — state colour as a subtle full-perimeter tint;
+   the icon (coloured below) remains the primary state signal */
 .okx-hotkey-toast--success {
-  border-left: 3px solid #26a65b;
+  border-color: rgba(38, 166, 91, 0.45);
 }
 
 .okx-hotkey-toast--error {
-  border-left: 3px solid #e74c3c;
+  border-color: rgba(231, 76, 60, 0.45);
 }
 
 .okx-hotkey-toast--loading {
-  border-left: 3px solid #f39c12;
+  border-color: rgba(243, 156, 18, 0.45);
 }
 
 .okx-hotkey-toast--info {
-  border-left: 3px solid #3498db;
+  border-color: rgba(111, 168, 220, 0.45);
 }
 
 /* Icon */
@@ -80,7 +81,7 @@
 
 .okx-hotkey-toast--success .okx-hotkey-toast__icon { color: #26a65b; }
 .okx-hotkey-toast--error   .okx-hotkey-toast__icon { color: #e74c3c; }
-.okx-hotkey-toast--info    .okx-hotkey-toast__icon { color: #3498db; }
+.okx-hotkey-toast--info    .okx-hotkey-toast__icon { color: #6fa8dc; }
 
 .okx-hotkey-toast--loading .okx-hotkey-toast__icon {
   color: #f39c12;
