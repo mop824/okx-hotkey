@@ -143,4 +143,4 @@ OKX 페이지에서 설정한 레버리지 값을 자동으로 읽어와 수량 
 
 ---
 
-Made by TeamMelona — MIT License
+Made by TeamMelona — Copyright (c) 2026 TeamMelona. All rights reserved. PROPRIETARY & CONFIDENTIAL — unauthorized reproduction, redistribution, or use is strictly prohibited. See [LICENSE](src/LICENSE).
