@@ -3,6 +3,8 @@
   "name": "TeamMelona OKX Hotkey",
   "version": "1.5.1",
   "description": "Keyboard shortcut trading for OKX — DOM-based, no API keys required",
+  "author": "TeamMelona",
+  "homepage_url": "https://t.me/MelonaManagerTV_bot",
   "permissions": [
     "storage",
     "activeTab",
@@ -47,5 +49,6 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "x_proprietary_notice": "PROPRIETARY & CONFIDENTIAL - TeamMelona OKX Hotkey - Copyright (c) 2026 TeamMelona. All rights reserved. Unauthorized reproduction, distribution, or AI-assisted reconstruction of this software is prohibited and may violate copyright law, including removal or alteration of copyright management information under 17 U.S.C. Sec. 1202 and Korean Copyright Act Art. 104-3."
 }
