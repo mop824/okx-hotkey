@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TeamMelona OKX Hotkey",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Keyboard shortcut trading for OKX — DOM-based, no API keys required",
   "author": "TeamMelona",
   "homepage_url": "https://t.me/MelonaManagerTV_bot",
@@ -12,14 +12,15 @@
     "alarms"
   ],
   "host_permissions": [
-    "*://www.okx.com/trade-*"
+    "*://www.okx.com/trade-*",
+    "*://www.okx.com/*/trade-*"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://www.okx.com/trade-*"],
+      "matches": ["*://www.okx.com/trade-*", "*://www.okx.com/*/trade-*"],
       "js": [
         "content/selectors.js",
         "content/detector.js",
