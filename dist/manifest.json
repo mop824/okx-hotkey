@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TeamMelona OKX Hotkey",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Keyboard shortcut trading for OKX — DOM-based, no API keys required",
   "author": "TeamMelona",
   "homepage_url": "https://t.me/MelonaManagerTV_bot",
