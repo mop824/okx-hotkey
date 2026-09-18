@@ -1,0 +1,48 @@
+#!/bin/sh
+# pre-push guard for the PUBLIC okx-hotkey repo: it publishes the built
+# extension only; the extension source and server live in the PRIVATE
+# okx-hotkey-src repo. Refuse any push touching a path outside the allowlist.
+# Enable with: git config core.hooksPath .githooks  (bypasses: --no-verify)
+set -u
+
+violations=""
+
+is_zero() {
+  # all-zeros object id (40 or 64 hex chars) means delete / new branch
+  case "$1" in
+    '' | *[!0]*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+record() {
+  case "$1" in
+    dist/* | README.md | release-notes-*.md | .gitignore | .github/* | .githooks/*) ;;
+    *) violations="$violations$1
+" ;;
+  esac
+}
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  is_zero "$local_sha" && continue
+  if is_zero "$remote_sha"; then
+    # New branch: every pushed commit not already in remote history.
+    commits=$(git rev-list "$local_sha" --not --remotes </dev/null) || exit 1
+    [ -z "$commits" ] && continue
+    paths=$(git -c core.quotePath=false diff-tree -r --root --no-commit-id --name-only $commits </dev/null) || exit 1
+  else
+    paths=$(git -c core.quotePath=false diff --name-only "$remote_sha" "$local_sha" </dev/null) || exit 1
+  fi
+  while IFS= read -r path; do
+    [ -n "$path" ] && record "$path"
+  done <<EOF
+$paths
+EOF
+done
+
+if [ -n "$violations" ]; then
+  printf '%s' "$violations" | sort -u | sed -e 's/^/pre-push: blocked path: /' 1>&2
+  echo "pre-push: push refused -- the public repo publishes the built extension only; the source lives in the private repo." 1>&2
+  exit 1
+fi
+exit 0
