@@ -45,6 +45,41 @@ MSG
   git -C "$dir" rev-parse HEAD
 }
 
+# Plumbing helpers: build commits/merges on top of an arbitrary parent using a
+# throwaway index -- no worktree changes, no checkout/merge (both restricted).
+# tree_edit_commit <dir> <parent> add|rm <path> [content] -> new commit sha
+tree_edit_commit() {
+  local dir=$1 parent=$2 mode=$3 path=$4 content=${5:-} blob tree idx
+  idx=$dir/.test-index
+  rm -f "$idx"
+  GIT_INDEX_FILE=$idx git -C "$dir" read-tree "$parent" </dev/null || return 1
+  case $mode in
+    add)
+      blob=$(printf '%s\n' "$content" | git -C "$dir" hash-object -w --stdin) || return 1
+      GIT_INDEX_FILE=$idx git -C "$dir" update-index --add --cacheinfo 100644,"$blob","$path" </dev/null || return 1 ;;
+    rm)
+      GIT_INDEX_FILE=$idx git -C "$dir" update-index --force-remove "$path" </dev/null || return 1 ;;
+    *) return 2 ;;
+  esac
+  tree=$(GIT_INDEX_FILE=$idx git -C "$dir" write-tree) || return 1
+  git -C "$dir" commit-tree "$tree" -p "$parent" <<'MSG'
+test
+MSG
+}
+
+# merge_tree <dir> <parent1> <parent2> -> merge commit sha (trivial merge:
+# the parents must touch disjoint paths)
+merge_tree() {
+  local dir=$1 c1=$2 c2=$3 tree idx
+  idx=$dir/.test-index
+  rm -f "$idx"
+  GIT_INDEX_FILE=$idx git -C "$dir" read-tree -m "$c1" "$c2" </dev/null || return 1
+  tree=$(GIT_INDEX_FILE=$idx git -C "$dir" write-tree) || return 1
+  git -C "$dir" commit-tree "$tree" -p "$c1" -p "$c2" <<'MSG'
+merge
+MSG
+}
+
 # The hook is invoked exactly as git invokes it: stdin ref lines, cwd = repo top level.
 expect_status() {
   local desc=$1 want=$2 stdin_text=$3 dir=$4 out got
@@ -161,6 +196,56 @@ expect_output_contains "spaces-in-path refusal names it" "src/a b.js" "$head $he
 
 # 10. empty stdin (no refs to push) exits 0
 expect_status "empty stdin exits 0" 0 "" "$repo_root"
+
+# 11. update push whose intermediate commit adds src/leak.js and whose tip
+# deletes it again: the endpoint diff is empty, but the blob is still pushed.
+r=$work/mid-leak; new_repo "$r"
+mkdir -p "$r/dist" && echo x > "$r/dist/a.js"
+base=$(commit_all "$r") || setup_fail
+mid=$(tree_edit_commit "$r" "$base" add src/leak.js leak) || setup_fail
+head=$(tree_edit_commit "$r" "$mid" rm src/leak.js) || setup_fail
+expect_status "update push with deleted-again src/leak.js is refused" 1 "$head $head $head $base
+" "$r"
+expect_output_contains "intermediate-leak refusal names src/leak.js" "src/leak.js" "$head $head $head $base
+" "$r"
+
+# 12. new-branch push whose merge commit has a non-first parent that added
+# src/leak.js; that parent is reachable from a remote-tracking ref, so only
+# the merge commit is enumerated -- diff-tree must not print nothing for it.
+r=$work/merge-leak; new_repo "$r"
+mkdir -p "$r/dist" && echo x > "$r/dist/a.js"
+base=$(commit_all "$r") || setup_fail
+feat=$(tree_edit_commit "$r" "$base" add src/leak.js leak) || setup_fail
+main2=$(tree_edit_commit "$r" "$base" add dist/c.js y) || setup_fail
+merge=$(merge_tree "$r" "$main2" "$feat") || setup_fail
+git -C "$r" update-ref refs/remotes/origin/feature "$feat" || setup_fail
+expect_status "new-branch merge with leaked non-first parent is refused" 1 "$merge $merge $merge $Zrepo
+" "$r"
+expect_output_contains "merge-leak refusal names src/leak.js" "src/leak.js" "$merge $merge $merge $Zrepo
+" "$r"
+
+# 13. update push whose range contains a merge commit touching only dist/:
+# inspecting merges must not false-block it.
+r=$work/merge-dist; new_repo "$r"
+mkdir -p "$r/dist" && echo x > "$r/dist/a.js"
+base=$(commit_all "$r") || setup_fail
+feat=$(tree_edit_commit "$r" "$base" add dist/feat.js y) || setup_fail
+main2=$(tree_edit_commit "$r" "$base" add dist/main2.js y) || setup_fail
+merge=$(merge_tree "$r" "$main2" "$feat") || setup_fail
+expect_status "update push with dist-only merge passes" 0 "$merge $merge $merge $base
+" "$r"
+
+# 14. new-branch push whose root commit adds src/leak.js: rev-list reports the
+# root commit last, and diff-tree --root applies only to its first commit, so
+# each commit must be inspected with its own invocation.
+r=$work/root-leak; new_repo "$r"
+mkdir -p "$r/src" && echo x > "$r/src/leak.js"
+root=$(commit_all "$r") || setup_fail
+head=$(tree_edit_commit "$r" "$root" add dist/ok.js y) || setup_fail
+expect_status "new-branch root-commit leak is refused" 1 "$head $head $head $Zrepo
+" "$r"
+expect_output_contains "root-commit leak refusal names src/leak.js" "src/leak.js" "$head $head $head $Zrepo
+" "$r"
 
 printf 'passed=%d failed=0\n' "$passed"
 exit 0

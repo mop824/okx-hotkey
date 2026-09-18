@@ -2,6 +2,10 @@
 # pre-push guard for the PUBLIC okx-hotkey repo: it publishes the built
 # extension only; the extension source and server live in the PRIVATE
 # okx-hotkey-src repo. Refuse any push touching a path outside the allowlist.
+# The rule covers EVERY commit in the pushed range: an endpoint diff misses a
+# path added by an intermediate commit and deleted again before the tip (the
+# blob is still pushed), and diff-tree without -m prints nothing for merge
+# commits, so a path arriving via a non-first parent would slip through.
 # Enable with: git config core.hooksPath .githooks  (bypasses: --no-verify)
 set -u
 
@@ -28,16 +32,21 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   if is_zero "$remote_sha"; then
     # New branch: every pushed commit not already in remote history.
     commits=$(git rev-list "$local_sha" --not --remotes </dev/null) || exit 1
-    [ -z "$commits" ] && continue
-    paths=$(git -c core.quotePath=false diff-tree -r --root --no-commit-id --name-only $commits </dev/null) || exit 1
   else
-    paths=$(git -c core.quotePath=false diff --name-only "$remote_sha" "$local_sha" </dev/null) || exit 1
+    # Update: every commit being pushed, not just the endpoint delta.
+    commits=$(git rev-list "$local_sha" --not "$remote_sha" </dev/null) || exit 1
   fi
-  while IFS= read -r path; do
-    [ -n "$path" ] && record "$path"
-  done <<EOF
+  # One diff-tree per commit: --root applies only to the first commit in the
+  # list, and rev-list reports the root commit last. -m makes git diff a
+  # merge against EACH parent, so a path introduced by any parent is seen.
+  for commit in $commits; do
+    paths=$(git -c core.quotePath=false diff-tree -m -r --root --no-commit-id --name-only "$commit" </dev/null) || exit 1
+    while IFS= read -r path; do
+      [ -n "$path" ] && record "$path"
+    done <<EOF
 $paths
 EOF
+  done
 done
 
 if [ -n "$violations" ]; then
